@@ -529,7 +529,7 @@ github://facebook/react/
 ├── Issues/               ← 虚拟入口       类型列: 📋 523 open
 ├── Pulls/                ← 虚拟入口       类型列: 🔀 12 open
 ├── Branches/             ← 虚拟入口       类型列: 🌿 5
-├── Tags/                 ← 虚拟入口       类型列: 🏷️ 30
+├── Tags/                 ← 虚拟入口       类型列: 🏷 30
 └── Releases/             ← 虚拟入口       类型列: 📦 10
 
 想看纯代码？导航到 github://facebook/react/Code/
@@ -790,7 +790,7 @@ github://Trending/monthly/rust/            ← 本月 Rust 趋势
 | Fork | `isFork === true` | 🔀 Fork（非原创） |
 | 新项目 | 创建 < 30天 | 🆕 新项目（数据不足） |
 | 推荐 | 健康度 ≥ 70 | ✅ 推荐（健康度 N） |
-| 谨慎 | 健康度 40-69 | ⚠️ 谨慎（健康度 N） |
+| 谨慎 | 健康度 40-69 | ⚠ 谨慎（健康度 N） |
 | 不推荐 | 健康度 < 40 | ❌ 不推荐（健康度 N） |
 
 #### 6.2.5 路径感知列组 — 同一列名，不同路径下含义不同
@@ -835,7 +835,7 @@ github://Trending/monthly/rust/            ← 本月 Rust 趋势
 | ghupdated | 更新时间 | 左 | DLL | pushed_at |
 | ghlicense | 协议 | 左 | DLL | license.spdx_id |
 | ghtopics | 主题 | 左 | DLL | topics 数组 |
-| ghstatus | 状态 | 左 | DLL | ⭐已星标 👁️已关注 🔒私有 📦归档 🍴Fork |
+| ghstatus | 状态 | 左 | DLL | ⭐已星标 👁已关注 🔒私有 📦归档 🍴Fork |
 | ghhealth | 健康度 | 右 | 脚本 | 0-100 评分 |
 | ghcategory | 类别 | 左 | 脚本 | 框架/库/工具/应用/文档/配置 |
 | ghstarbar | 星标可视化 | 左 | 脚本 | ████████░░ 223k |
@@ -1156,8 +1156,8 @@ github://Trending/monthly/rust/            ← 本月 Rust 趋势
 ├── 🔍 搜索 Commits...
 ├── 🔍 搜索 Topics...
 ├── ────────────────
-├── ⚙️ 配置认证...
-├── ⚙️ 配置代理...
+├── ⚙ 配置认证...
+├── ⚙ 配置代理...
 └── 📊 API 用量
 ```
 
@@ -1166,7 +1166,7 @@ github://Trending/monthly/rust/            ← 本月 Rust 趋势
 ```
 右键（仓库上）：
 ├── ⭐ Star / 取消 Star          ← CHECKED 状态
-├── 👁️ Watch / 取消 Watch         ← CHECKED 状态
+├── 👁 Watch / 取消 Watch         ← CHECKED 状态
 ├── 🍴 Fork
 ├── ────────────────
 ├── 📋 复制
@@ -1187,7 +1187,7 @@ github://Trending/monthly/rust/            ← 本月 Rust 趋势
 ```
 右键（空白处）：
 ├── ⭐ Star / 取消 Star
-├── 👁️ Watch / 取消 Watch
+├── 👁 Watch / 取消 Watch
 ├── 🍴 Fork
 ├── ────────────────
 ├── 📋 复制
@@ -1199,18 +1199,18 @@ github://Trending/monthly/rust/            ← 本月 Rust 趋势
 ├── 📥 下载 ZIP
 ├── 📥 下载 TAR
 ├── ────────────────
-├── ✏️ 编辑描述
-├── ✏️ 编辑主题
-├── ✏️ 编辑主页
+├── ✏ 编辑描述
+├── ✏ 编辑主题
+├── ✏ 编辑主页
 ├── ────────────────
 ├── 🔍 搜索此仓库...
 ├── ⚡ 快速跳转
 │   ├── 📋 Issues (523)
 │   ├── 🔀 Pulls (12)
 │   ├── 🌿 Branches (5)
-│   ├── 🏷️ Tags (30)
+│   ├── 🏷 Tags (30)
 │   ├── 📦 Releases (10)
-│   └── ⬆️ 返回仓库根目录
+│   └── ⬆ 返回仓库根目录
 ├── ────────────────
 ├── 🌐 在浏览器中打开
 ├── 🌐 查看 Issues
@@ -1243,13 +1243,13 @@ github://Trending/monthly/rust/            ← 本月 Rust 趋势
 ```
 右键（Issue上）：
 ├── 🌐 在浏览器中打开
-├── ✏️ 关闭 / 重新打开
-├── 🏷️ 添加标签
+├── ✏ 关闭 / 重新打开
+├── 🏷 添加标签
 ├── 💬 添加评论
 └── 📋 复制标题
 
 右键（空白处）：
-├── ✏️ 新建 Issue...
+├── ✏ 新建 Issue...
 └── 🔍 搜索此仓库 Issues...
 ```
 
@@ -1258,9 +1258,9 @@ github://Trending/monthly/rust/            ← 本月 Rust 趋势
 ```
 右键（PR上）：
 ├── 🌐 在浏览器中打开
-├── ✏️ 关闭 / 重新打开
+├── ✏ 关闭 / 重新打开
 ├── 🔀 合并 PR
-├── 🏷️ 添加标签
+├── 🏷 添加标签
 ├── 💬 添加评论
 └── 📋 复制标题
 ```
@@ -1309,8 +1309,8 @@ github://Trending/monthly/rust/            ← 本月 Rust 趋势
 
 ```
 右键（Gist上）：
-├── ✏️ 编辑 Gist
-├── 🗑️ 删除 Gist
+├── ✏ 编辑 Gist
+├── 🗑 删除 Gist
 ├── 🌐 在浏览器中打开
 └── 📋 复制 Gist URL
 ```
@@ -1450,7 +1450,7 @@ github://Search/
 ├── 👤 Users/          ← 双击弹出用户搜索对话框
 ├── 📋 Issues/         ← 双击弹出 Issue 搜索对话框
 ├── 📝 Commits/        ← 双击弹出提交搜索对话框
-└── 🏷️ Topics/         ← 双击弹出主题搜索对话框
+└── 🏷 Topics/         ← 双击弹出主题搜索对话框
 ```
 
 ---
@@ -1464,7 +1464,7 @@ DOpus 原生支持多选，VFS 插件右键菜单自动对多选生效
 
 选中 5 个仓库 → 右键：
 ├── ⭐ 批量星标（5）
-├── 👁️ 批量关注（5）
+├── 👁 批量关注（5）
 ├── 📋 复制仓库地址（5）
 └── 📥 批量克隆...（5）
 
@@ -1478,9 +1478,9 @@ VFS_ContextVerbW 处理 lpszFiles 中的多个路径
 ├── 📋 Issues (523)
 ├── 🔀 Pulls (12)
 ├── 🌿 Branches (5)
-├── 🏷️ Tags (30)
+├── 🏷 Tags (30)
 ├── 📦 Releases (10)
-└── ⬆️ 返回仓库根目录
+└── ⬆ 返回仓库根目录
 
 点击直接跳转，不需要回根目录
 ```
@@ -1799,7 +1799,7 @@ torvalds/linux │ ... │ 2小时前 ⚠
   本会话请求：769
 
 自动节流：
-  剩余 < 100 → 列显示 ⚠️ 警告
+  剩余 < 100 → 列显示 ⚠ 警告
   剩余 < 10 → 自动降级为纯缓存模式
   剩余 = 0 → 显示错误提示，等待重置
 
@@ -1839,7 +1839,7 @@ void UpdateRateLimit(const std::map<std::string, std::string>& headers) {
 bool CheckRateLimit() {
     if (s_rateLimitRemaining < 10) {
         // 显示警告 Toast
-        ShowToast(L"⚠️ API 配额即将耗尽");
+        ShowToast(L"⚠ API 配额即将耗尽");
         return false;
     }
     return true;
@@ -1914,7 +1914,7 @@ struct GitHubError {
 | 网络错误 | Toast + 重试按钮 | "网络连接失败，点击重试" |
 | 认证错误 | 配置对话框 | "Token 无效，请重新配置" |
 | 速率限制 | Toast + 倒计时 | "API 配额已用尽，47分钟后重置" |
-| 资源不存在 | 虚拟文件 | "⚠️ 仓库不存在.txt" |
+| 资源不存在 | 虚拟文件 | "⚠ 仓库不存在.txt" |
 | 服务器错误 | Toast | "GitHub 服务暂时不可用" |
 
 ### 13.6 Gists API 细节
@@ -2140,7 +2140,7 @@ retry_delay_ms=1000        ; 重试延迟（毫秒）
 | 场景 | 行为 |
 |------|------|
 | 缓存存在 | 直接返回缓存数据，列显示"📋 缓存"标记 |
-| 缓存不存在 | 显示虚拟文件"⚠️ 离线模式 - 无缓存数据.txt" |
+| 缓存不存在 | 显示虚拟文件"⚠ 离线模式 - 无缓存数据.txt" |
 | 写操作 | 显示 Toast "离线模式下不可执行此操作" |
 
 **缓存优先级**：
@@ -2674,7 +2674,7 @@ struct GitHubAssetInfo {
 
 已完成。所有需求通过多轮讨论确认。
 
-### 阶段2：方案设计 ⚠️ 设计完成，待实施
+### 阶段2：方案设计 ⚠ 设计完成，待实施
 
 | 任务 | 产出 | 状态 |
 |------|------|------|
@@ -3029,7 +3029,7 @@ trendingSince 和 trendingLang 都有值（Trending/daily/javascript/）：
    - Issues/     类型列: "📋 {openIssuesCount} open"
    - Pulls/      类型列: "🔀 {openPullsCount} open"
    - Branches/   类型列: "🌿 {branchCount}"
-   - Tags/       类型列: "🏷️ {tagCount}"
+   - Tags/       类型列: "🏷 {tagCount}"
    - Releases/   类型列: "📦 {releaseCount}"
 
 2. 遍历 API 返回的真实文件列表：

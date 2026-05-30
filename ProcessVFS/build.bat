@@ -26,14 +26,14 @@ echo.
 
 cd /d "%SRCDIR%"
 
-rc.exe /nologo resource.rc
+rc.exe /nologo src/resource.rc
 
 if %ERRORLEVEL% NEQ 0 (
     echo Resource compilation failed, continuing without resources...
     set RESFILE=
 ) else (
     echo Resource compiled successfully.
-    set RESFILE=resource.res
+    set RESFILE=src/resource.res
 )
 
 echo.
@@ -41,7 +41,7 @@ echo Compiling ProcessVFS.dll...
 echo.
 
 set SOURCES=src/ProcessVFS.cpp
-set INCLUDES=/I"include" /I"."
+set INCLUDES=/I"include" /I"src"
 set DEFINES=/DUNICODE /D_UNICODE /DWIN32_LEAN_AND_MEAN /DDOPUS_PLUGIN_HELPER /DVFSPLUGINVERSION=2
 set CXXFLAGS=/nologo /W3 /O2 /EHsc /std:c++17 /MT /LD /utf-8
 set LIBS=Shell32.lib User32.lib Advapi32.lib Comctl32.lib Psapi.lib Gdi32.lib Ole32.lib Version.lib Ws2_32.lib Iphlpapi.lib

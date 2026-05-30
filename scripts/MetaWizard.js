@@ -1,4 +1,4 @@
-﻿/* Meta Wizard Command for Directory Opus
+/* Meta Wizard Command for Directory Opus
 **An intuitive and efficient metadata search and replace**
 Meta Wizard © 2024 by Christian Arellano García is licensed under CC BY-NC-ND 4.0 
     This program is distributed in the hope that it will be useful,

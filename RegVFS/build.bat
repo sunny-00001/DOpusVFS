@@ -26,14 +26,14 @@ echo.
 
 cd /d "%SRCDIR%"
 
-rc.exe /nologo resource.rc
+rc.exe /nologo src/resource.rc
 
 if %ERRORLEVEL% NEQ 0 (
     echo Resource compilation failed, continuing without resources...
     set RESFILE=
 ) else (
     echo Resource compiled successfully.
-    set RESFILE=resource.res
+    set RESFILE=src/resource.res
 )
 
 echo.
@@ -41,7 +41,7 @@ echo Compiling RegistryVFS.dll...
 echo.
 
 set SOURCES=src\RegistryVFS.cpp
-set INCLUDES=/I"include" /I"."
+set INCLUDES=/I"include" /I"src"
 set DEFINES=/DUNICODE /D_UNICODE /DWIN32_LEAN_AND_MEAN /DDOPUS_PLUGIN_HELPER /DVFSPLUGINVERSION=2
 set CXXFLAGS=/nologo /W4 /O2 /EHsc /MD /LD /utf-8
 set LIBS=advapi32.lib Shell32.lib Comctl32.lib Comdlg32.lib Ole32.lib User32.lib Gdi32.lib

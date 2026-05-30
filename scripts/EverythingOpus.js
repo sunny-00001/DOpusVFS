@@ -1,4 +1,4 @@
-﻿/*
+/*
 ╔══════════════════════════════════════════════════════════════
 ║ EverythingOpus - A better dialog to integrate Everything with Directory Opus
 ║ (c) 2025 by Bytim

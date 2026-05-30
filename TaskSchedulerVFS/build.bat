@@ -31,7 +31,7 @@ echo Working directory: %SRCDIR%
 cd /d "%SRCDIR%"
 echo Compiling resources...
 
-rc.exe /I "." /I "include" resource.rc
+rc.exe /I "src" /I "include" src/resource.rc
 if errorlevel 1 (
     echo Resource compilation failed!
     pause
@@ -40,7 +40,7 @@ if errorlevel 1 (
 
 echo Compiling TaskSchedulerVFS.dll...
 
-cl.exe /MT /O2 /EHsc /std:c++17 /utf-8 /I "." /I "include" /LD src\TaskSchedulerVFS.cpp resource.res /DUNICODE /D_UNICODE /DWIN32_LEAN_AND_MEAN /DDOPUS_PLUGIN_HELPER /DVFSPLUGINVERSION=2 /link /DEF:src\TaskSchedulerVFS.def Advapi32.lib Shell32.lib Comctl32.lib Ole32.lib OleAut32.lib Gdi32.lib Comdlg32.lib Taskschd.lib /OUT:"%OUTDIR%\TaskSchedulerVFS.dll"
+cl.exe /MT /O2 /EHsc /std:c++17 /utf-8 /I "src" /I "include" /LD src\TaskSchedulerVFS.cpp src/resource.res /DUNICODE /D_UNICODE /DWIN32_LEAN_AND_MEAN /DDOPUS_PLUGIN_HELPER /DVFSPLUGINVERSION=2 /link /DEF:src\TaskSchedulerVFS.def Advapi32.lib Shell32.lib Comctl32.lib Ole32.lib OleAut32.lib Gdi32.lib Comdlg32.lib Taskschd.lib /OUT:"%OUTDIR%\TaskSchedulerVFS.dll"
 
 if errorlevel 1 (
     echo.
@@ -72,7 +72,7 @@ if errorlevel 1 (
 :Cleanup
 echo.
 echo Cleaning up temporary files...
-if exist resource.res del /F resource.res
+if exist src/resource.res del /F src/resource.res
 if exist "src\TaskSchedulerVFS.obj" del /F "src\TaskSchedulerVFS.obj"
 if exist TaskSchedulerVFS.exp del /F TaskSchedulerVFS.exp
 if exist TaskSchedulerVFS.lib del /F TaskSchedulerVFS.lib

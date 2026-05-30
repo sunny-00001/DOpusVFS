@@ -1,4 +1,4 @@
-﻿﻿﻿﻿LIBRARY "ProcessVFS"
+LIBRARY "ProcessVFS"
 EXPORTS
     VFS_Init
     VFS_Uninit

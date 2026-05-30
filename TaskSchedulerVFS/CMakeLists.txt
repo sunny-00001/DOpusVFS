@@ -10,11 +10,12 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 
 add_library(TaskSchedulerVFS SHARED
     src/TaskSchedulerVFS.cpp
+    src/resource.rc
 )
 
 target_include_directories(TaskSchedulerVFS PRIVATE
     ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/src
 )
 
 target_compile_definitions(TaskSchedulerVFS PRIVATE

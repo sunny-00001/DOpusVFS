@@ -1,4 +1,4 @@
-﻿/* Columns Viewer Command for Directory Opus
+/* Columns Viewer Command for Directory Opus
 **GUI for view/copy values for almost all available columns**
 Columns Viewer 2.0 © 2024 by Christian Arellano García is licensed under an MIT license. 
     This script is distributed in the hope that it will be useful,

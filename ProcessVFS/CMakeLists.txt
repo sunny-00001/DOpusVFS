@@ -10,12 +10,12 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 
 add_library(ProcessVFS SHARED
     src/ProcessVFS.cpp
-    resource.rc
+    src/resource.rc
 )
 
 target_include_directories(ProcessVFS PRIVATE
     ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/src
 )
 
 target_compile_definitions(ProcessVFS PRIVATE

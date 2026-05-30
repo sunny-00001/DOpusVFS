@@ -1,4 +1,4 @@
-﻿@include inc_commonSAL.js
+@include inc_commonSAL.js
 @include inc_Logger.js
 @include inc_MsgLoopHandler.js
 // CommonLogger

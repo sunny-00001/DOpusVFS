@@ -1,4 +1,4 @@
-﻿/* SearchDupes with Everything Command for Directory Opus
+/* SearchDupes with Everything Command for Directory Opus
 **Search for dupes with Everything and DOpus**
 SearchDupes © 2024 by Christian Arellano García is licensed under CC BY-NC-ND 4.0 
     This program is distributed in the hope that it will be useful,

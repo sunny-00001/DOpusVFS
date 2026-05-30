@@ -10,12 +10,12 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 
 add_library(EnvVFS SHARED
     src/EnvVFS.cpp
-    resource.rc
+    src/resource.rc
 )
 
 target_include_directories(EnvVFS PRIVATE
     ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/src
 )
 
 target_compile_definitions(EnvVFS PRIVATE
@@ -43,7 +43,7 @@ set_target_properties(EnvVFS PROPERTIES
 
 if(MSVC)
     target_compile_options(EnvVFS PRIVATE /W4 /utf-8)
-    target_link_options(EnvVFS PRIVATE /DEF:${CMAKE_SOURCE_DIR}/EnvVFS.def)
+    target_link_options(EnvVFS PRIVATE /DEF:${CMAKE_SOURCE_DIR}/src/EnvVFS.def)
 endif()
 
 foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})

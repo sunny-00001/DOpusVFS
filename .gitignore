@@ -9,7 +9,13 @@
 *.pdb
 *.ilk
 
-# CMake
+# CMake build directories
+build/
+x64/
+Release/
+Debug/
+
+# CMake generated files
 CMakeCache.txt
 CMakeFiles/
 cmake_install.cmake
@@ -20,6 +26,10 @@ cmake_install.cmake
 .ninja_deps
 .ninja_log
 build.ninja
+*.recipe
+*.tlog
+*.dll.recipe
+*.exe.recipe
 
 # IDE
 .vs/
@@ -28,6 +38,7 @@ build.ninja
 *.sdf
 *.opensdf
 ipch/
+.trae/
 
 # Logs and temp files
 *.log
@@ -65,3 +76,11 @@ restart_*.bat
 test_dialog*.ps1
 test_resource.ps1
 capture_debug.ps1
+
+# Encoding report files
+*_bom_*.txt
+*_crlf_*.txt
+*_nonutf8_*.txt
+*_zw_*.txt
+bom_report.txt
+encoding_*.txt

@@ -10,11 +10,12 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 
 add_library(WIFIVFS SHARED
     src/WIFIVFS.cpp
-    resource.rc
+    src/resource.rc
 )
 
 target_include_directories(WIFIVFS PRIVATE
     ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}/src
 )
 
 target_compile_definitions(WIFIVFS PRIVATE
@@ -43,7 +44,7 @@ set_target_properties(WIFIVFS PROPERTIES
 
 if(MSVC)
     target_compile_options(WIFIVFS PRIVATE /W4 /utf-8)
-    target_link_options(WIFIVFS PRIVATE /DEF:${CMAKE_SOURCE_DIR}/WIFIVFS.def)
+    target_link_options(WIFIVFS PRIVATE /DEF:${CMAKE_SOURCE_DIR}/src/WIFIVFS.def)
 endif()
 
 foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})

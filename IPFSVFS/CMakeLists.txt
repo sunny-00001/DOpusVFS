@@ -10,13 +10,13 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 
 add_library(IPFSVFS SHARED
     src/IPFSVFS.cpp
-    IPFSClient.cpp
-    resource.rc
+    src/IPFSClient.cpp
+    src/resource.rc
 )
 
 target_include_directories(IPFSVFS PRIVATE
     ${CMAKE_SOURCE_DIR}/include
-    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_SOURCE_DIR}/src
 )
 
 target_compile_definitions(IPFSVFS PRIVATE
@@ -46,7 +46,7 @@ set_target_properties(IPFSVFS PROPERTIES
 
 if(MSVC)
     target_compile_options(IPFSVFS PRIVATE /W4 /utf-8)
-    target_link_options(IPFSVFS PRIVATE /DEF:${CMAKE_SOURCE_DIR}/IPFSVFS.def /NOIMPLIB)
+    target_link_options(IPFSVFS PRIVATE /DEF:${CMAKE_SOURCE_DIR}/src/IPFSVFS.def /NOIMPLIB)
 endif()
 
 foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})

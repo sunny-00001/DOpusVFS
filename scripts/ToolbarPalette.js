@@ -1,4 +1,4 @@
-﻿/* ToolbarPalette Command for Directory Opus
+/* ToolbarPalette Command for Directory Opus
 **DOpus Toolbar Palette!**
 ToolbarPalette © 2024-2025 by Christian Arellano García 
     This program is distributed in the hope that it will be useful,
@@ -181,8 +181,8 @@ function OnFAYToolbarPalette(ScriptFAYTCommandData) {
 			desc = toolbars_map(item_index)('desc');
 			if (!c_value || wild.match(label) || (use_desc && wild.match(desc))) {
 				fayt_map.run.Set(value, item_index);
-				if (value && value !== label) label = value + ' : ​' + label;
-				while (fayt_map.suggest.Exists(label)) label += '​';
+				if (value && value !== label) label = value + ' : ' + label;
+				while (fayt_map.suggest.Exists(label)) label += '';
 				fayt_map.run.Set(label, item_index);
 				fayt_map.suggest.Set(label, '(' + toolbars_map(item_index)('toolbar') + ') ' + desc);
 			}

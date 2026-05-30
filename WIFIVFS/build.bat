@@ -26,23 +26,23 @@ echo.
 
 cd /d "%SRCDIR%"
 
-if exist resource_utf16.rc (
-    rc.exe /nologo resource_utf16.rc
+if exist src/resource_utf16.rc (
+    rc.exe /nologo src/resource_utf16.rc
     if %ERRORLEVEL% NEQ 0 (
         echo Resource compilation failed, continuing without resources...
         set RESFILE=
     ) else (
         echo Resource compiled successfully.
-        set RESFILE=resource_utf16.res
+        set RESFILE=src/resource_utf16.res
     )
 ) else (
-    rc.exe /nologo resource.rc
+    rc.exe /nologo src/resource.rc
     if %ERRORLEVEL% NEQ 0 (
         echo Resource compilation failed, continuing without resources...
         set RESFILE=
     ) else (
         echo Resource compiled successfully.
-        set RESFILE=resource.res
+        set RESFILE=src/resource.res
     )
 )
 
@@ -51,16 +51,16 @@ echo Compiling WIFIVFS.dll...
 echo.
 
 set SOURCES=src/WIFIVFS.cpp
-set INCLUDES=/I"include" /I"."
+set INCLUDES=/I"include" /I"src"
 set DEFINES=/DUNICODE /D_UNICODE /DWIN32_LEAN_AND_MEAN /DDOPUS_PLUGIN_HELPER /DVFSPLUGINVERSION=2 /D_CRT_SECURE_NO_WARNINGS
 set CXXFLAGS=/nologo /W3 /O2 /EHsc /MT /LD /utf-8
 set LIBS=Shell32.lib User32.lib Advapi32.lib Comctl32.lib
 set OUTFILE=%OUTDIR%\WIFIVFS.dll
 
 if defined RESFILE (
-    cl.exe %CXXFLAGS% %INCLUDES% %DEFINES% %SOURCES% /Fe"%OUTFILE%" /link /DEF:WIFIVFS.def %LIBS% %RESFILE%
+    cl.exe %CXXFLAGS% %INCLUDES% %DEFINES% %SOURCES% /Fe"%OUTFILE%" /link /DEF:src/WIFIVFS.def %LIBS% %RESFILE%
 ) else (
-    cl.exe %CXXFLAGS% %INCLUDES% %DEFINES% %SOURCES% /Fe"%OUTFILE%" /link /DEF:WIFIVFS.def %LIBS%
+    cl.exe %CXXFLAGS% %INCLUDES% %DEFINES% %SOURCES% /Fe"%OUTFILE%" /link /DEF:src/WIFIVFS.def %LIBS%
 )
 
 if %ERRORLEVEL% EQU 0 (

@@ -1,4 +1,4 @@
-﻿/* Filter by Column for Directory Opus
+/* Filter by Column for Directory Opus
 **Powerful filtering/searching tool for all columns**
 Filter by Column © 2024 by Christian Arellano García is licensed under CC BY-NC-ND 4.0 
     This program is distributed in the hope that it will be useful,

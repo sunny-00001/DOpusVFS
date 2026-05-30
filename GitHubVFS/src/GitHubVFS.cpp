@@ -3995,14 +3995,14 @@ extern "C" __declspec(dllexport) BOOL VFS_GetContextMenuW(HANDLE hVFSData, LPVFS
         AddItem(0, L"🔍 搜索 Issues...(&I)", L"$gh_search_issues");
         AddSep();
         AddItem(0, L"⭐ 我的星标仓库", L"$gh_view_starred");
-        AddItem(0, L"👁️ 我关注的仓库", L"$gh_view_watched");
+        AddItem(0, L"👁 我关注的仓库", L"$gh_view_watched");
         AddItem(0, L"🔔 我的通知", L"$gh_view_notifications");
         AddItem(0, L"📝 我的 Gists", L"$gh_view_gists");
         AddItem(0, L"🔥 Trending", L"$gh_view_trending");
         AddSep();
         AddItem(0, L"🔄 刷新缓存(&R)", L"$gh_refresh");
         AddSep();
-        AddItem(0, L"⚙️ 插件设置...(&P)", L"$gh_config");
+        AddItem(0, L"⚙ 插件设置...(&P)", L"$gh_config");
     }
     else if (pathInfo.context == GITHUB_CTX_REPOS || pathInfo.context == GITHUB_CTX_STARRED ||
              pathInfo.context == GITHUB_CTX_SUBSCRIPTIONS) {
