@@ -2837,6 +2837,120 @@ extern "C" __declspec(dllexport) HWND VFS_About(HWND hWndParent)
     return NULL;
 }
 
+static std::wstring GetExePathForIcon(LPCWSTR lpszFile)
+{
+    if (!lpszFile) return L"";
+
+    if (IsProcessRootPath(lpszFile)) return L"";
+
+    if (IsProcessFilePath(lpszFile))
+    {
+        DWORD pid = GetPidFromPath(lpszFile);
+        if (pid != 0)
+        {
+            std::wstring exePath = GetProcessExePath(pid);
+            if (!exePath.empty()) return exePath;
+        }
+        return L"";
+    }
+
+    if (IsProcessFolderPath(lpszFile))
+    {
+        std::wstring folderName = GetProcessFolderName(lpszFile);
+        if (folderName.empty()) return L"";
+
+        std::vector<ProcessInfo> processes;
+        if (GetCachedProcesses(processes))
+        {
+            for (const auto& info : processes)
+            {
+                if (_wcsicmp(info.name.c_str(), folderName.c_str()) == 0 && !info.exePath.empty())
+                    return info.exePath;
+            }
+        }
+
+        std::wstring searchName = folderName;
+        if (searchName.find(L'.') == std::wstring::npos)
+            searchName += L".exe";
+
+        std::wstring found = FindExeInSystemPaths(searchName);
+        if (!found.empty()) return found;
+
+        return L"";
+    }
+
+    return L"";
+}
+
+extern "C" __declspec(dllexport) BOOL VFS_GetFileIconW(HANDLE hVFSData, LPVFSFUNCDATA lpFuncData,
+    LPWSTR lpszFile, LPINT lpiSysIconIndex, HICON* phLargeIcon, HICON* phSmallIcon,
+    LPBOOL lpfDestroyIcons, LPWSTR lspzCacheName, int cchCacheNameMax, LPINT lpiCacheIndex)
+{
+    if (!lpszFile) return FALSE;
+
+    if (IsProcessRootPath(lpszFile)) return FALSE;
+
+    std::wstring exePath = GetExePathForIcon(lpszFile);
+
+    if (lpiSysIconIndex)
+        *lpiSysIconIndex = -1;
+
+    if (lpfDestroyIcons)
+        *lpfDestroyIcons = TRUE;
+
+    if (!exePath.empty())
+    {
+        HICON hLarge = NULL, hSmall = NULL;
+        UINT extracted = ExtractIconExW(exePath.c_str(), 0, &hLarge, &hSmall, 1);
+
+        if (extracted > 0 && (hLarge || hSmall))
+        {
+            if (phLargeIcon) *phLargeIcon = hLarge; else if (hLarge) DestroyIcon(hLarge);
+            if (phSmallIcon) *phSmallIcon = hSmall; else if (hSmall) DestroyIcon(hSmall);
+
+            if (lspzCacheName && cchCacheNameMax > 0)
+            {
+                DWORD pid = GetPidFromPath(lpszFile);
+                if (pid != 0)
+                    StringCchPrintfW(lspzCacheName, cchCacheNameMax, L"ProcessVFS_%u", pid);
+                else
+                {
+                    std::wstring folderName = GetProcessFolderName(lpszFile);
+                    StringCchPrintfW(lspzCacheName, cchCacheNameMax, L"ProcessVFS_%s", folderName.c_str());
+                }
+            }
+            if (lpiCacheIndex) *lpiCacheIndex = 0;
+
+            return TRUE;
+        }
+        if (hLarge) DestroyIcon(hLarge);
+        if (hSmall) DestroyIcon(hSmall);
+    }
+
+    SHFILEINFOW sfi = {};
+    if (!exePath.empty() && SHGetFileInfoW(exePath.c_str(), 0, &sfi, sizeof(sfi), SHGFI_ICON | SHGFI_LARGEICON))
+    {
+        if (phLargeIcon) *phLargeIcon = sfi.hIcon; else DestroyIcon(sfi.hIcon);
+    }
+
+    SHFILEINFOW sfiSmall = {};
+    if (!exePath.empty() && SHGetFileInfoW(exePath.c_str(), 0, &sfiSmall, sizeof(sfiSmall), SHGFI_ICON | SHGFI_SMALLICON))
+    {
+        if (phSmallIcon) *phSmallIcon = sfiSmall.hIcon; else DestroyIcon(sfiSmall.hIcon);
+    }
+
+    if (phLargeIcon && *phLargeIcon == NULL)
+        *phLargeIcon = LoadIcon(NULL, IDI_APPLICATION);
+    if (phSmallIcon && *phSmallIcon == NULL)
+        *phSmallIcon = LoadIcon(NULL, IDI_APPLICATION);
+
+    if (lspzCacheName && cchCacheNameMax > 0)
+        StringCchCopyW(lspzCacheName, cchCacheNameMax, L"ProcessVFS_Default");
+    if (lpiCacheIndex) *lpiCacheIndex = 0;
+
+    return TRUE;
+}
+
 extern "C" __declspec(dllexport) BOOL VFS_USBSafe(LPOPUSUSBSAFEDATA pUSBSafeData)
 {
     if (pUSBSafeData) pUSBSafeData->pszOtherExports[0] = L'\0';

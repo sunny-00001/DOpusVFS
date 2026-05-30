@@ -28,6 +28,7 @@ EXPORTS
     VFS_PropGetW
     VFS_GetFileSizeW
     VFS_GetLastError
+    VFS_GetFileIconW
     VFS_Configure
     VFS_About
     VFS_USBSafe
