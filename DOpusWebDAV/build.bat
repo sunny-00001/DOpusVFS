@@ -47,10 +47,12 @@ if errorlevel 1 (
     echo Build failed! Please check the error messages above.
     echo ========================================
     REM 即使失败也尝试清理临时文件
-    if exist "*.obj" del /Q "*.obj"
-    if exist "*.exp" del /Q "*.exp"
-    if exist "*.lib" del /Q "*.lib"
-    if exist "*.res" del /Q "*.res"
+    if exist "%SRCDIR%\*.obj" del /Q "%SRCDIR%\*.obj"
+    if exist "%SRCDIR%\*.exp" del /Q "%SRCDIR%\*.exp"
+    if exist "%SRCDIR%\*.lib" del /Q "%SRCDIR%\*.lib"
+    if exist "%SRCDIR%\*.res" del /Q "%SRCDIR%\*.res"
+    if exist "%OUTDIR%\DOpusWebDAV.exp" del /Q "%OUTDIR%\DOpusWebDAV.exp"
+    if exist "%OUTDIR%\DOpusWebDAV.lib" del /Q "%OUTDIR%\DOpusWebDAV.lib"
 ) else (
     echo.
     echo ========================================
@@ -61,10 +63,12 @@ if errorlevel 1 (
     REM 清理临时文件
     echo.
     echo Cleaning up temporary files...
-    if exist "*.obj" del /Q "*.obj"
-    if exist "*.exp" del /Q "*.exp"
-    if exist "*.lib" del /Q "*.lib"
-    if exist "*.res" del /Q "*.res"
+    if exist "%SRCDIR%\*.obj" del /Q "%SRCDIR%\*.obj"
+    if exist "%SRCDIR%\*.exp" del /Q "%SRCDIR%\*.exp"
+    if exist "%SRCDIR%\*.lib" del /Q "%SRCDIR%\*.lib"
+    if exist "%SRCDIR%\*.res" del /Q "%SRCDIR%\*.res"
+    if exist "%OUTDIR%\DOpusWebDAV.exp" del /Q "%OUTDIR%\DOpusWebDAV.exp"
+    if exist "%OUTDIR%\DOpusWebDAV.lib" del /Q "%OUTDIR%\DOpusWebDAV.lib"
     echo Temporary files cleaned up.
     
     if exist "%OUTDIR%\DOpusWebDAV.dll" (

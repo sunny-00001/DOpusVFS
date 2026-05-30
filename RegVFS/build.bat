@@ -62,10 +62,12 @@ if %ERRORLEVEL% EQU 0 (
     
     echo.
     echo Cleaning up temporary files...
-    if exist "*.obj" del /Q "*.obj"
-    if exist "*.exp" del /Q "*.exp"
-    if exist "*.lib" del /Q "*.lib"
-    if exist "*.res" del /Q "*.res"
+    if exist "%SRCDIR%\*.obj" del /Q "%SRCDIR%\*.obj"
+    if exist "%SRCDIR%\*.exp" del /Q "%SRCDIR%\*.exp"
+    if exist "%SRCDIR%\*.lib" del /Q "%SRCDIR%\*.lib"
+    if exist "%SRCDIR%\*.res" del /Q "%SRCDIR%\*.res"
+    if exist "%OUTDIR%\RegistryVFS.exp" del /Q "%OUTDIR%\RegistryVFS.exp"
+    if exist "%OUTDIR%\RegistryVFS.lib" del /Q "%OUTDIR%\RegistryVFS.lib"
     if exist "src\*.obj" del /Q "src\*.obj"
     if exist "src\*.res" del /Q "src\*.res"
     echo Cleanup complete.

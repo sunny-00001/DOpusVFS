@@ -63,10 +63,12 @@ if %ERRORLEVEL% EQU 0 (
     REM 清理临时文件
     echo.
     echo Cleaning up temporary files...
-    if exist "*.obj" del /Q "*.obj"
-    if exist "*.exp" del /Q "*.exp"
-    if exist "*.lib" del /Q "*.lib"
-    if exist "*.res" del /Q "*.res"
+    if exist "%SRCDIR%\*.obj" del /Q "%SRCDIR%\*.obj"
+    if exist "%SRCDIR%\*.exp" del /Q "%SRCDIR%\*.exp"
+    if exist "%SRCDIR%\*.lib" del /Q "%SRCDIR%\*.lib"
+    if exist "%SRCDIR%\*.res" del /Q "%SRCDIR%\*.res"
+    if exist "%OUTDIR%\IPFSVFS.exp" del /Q "%OUTDIR%\IPFSVFS.exp"
+    if exist "%OUTDIR%\IPFSVFS.lib" del /Q "%OUTDIR%\IPFSVFS.lib"
     if exist "src\*.obj" del /Q "src\*.obj"
     echo Temporary files cleaned up.
     
@@ -89,10 +91,12 @@ if %ERRORLEVEL% EQU 0 (
     echo Build failed!
     echo ========================================
     REM 即使失败也尝试清理临时文件
-    if exist "*.obj" del /Q "*.obj"
-    if exist "*.exp" del /Q "*.exp"
-    if exist "*.lib" del /Q "*.lib"
-    if exist "*.res" del /Q "*.res"
+    if exist "%SRCDIR%\*.obj" del /Q "%SRCDIR%\*.obj"
+    if exist "%SRCDIR%\*.exp" del /Q "%SRCDIR%\*.exp"
+    if exist "%SRCDIR%\*.lib" del /Q "%SRCDIR%\*.lib"
+    if exist "%SRCDIR%\*.res" del /Q "%SRCDIR%\*.res"
+    if exist "%OUTDIR%\IPFSVFS.exp" del /Q "%OUTDIR%\IPFSVFS.exp"
+    if exist "%OUTDIR%\IPFSVFS.lib" del /Q "%OUTDIR%\IPFSVFS.lib"
     if exist "src\*.obj" del /Q "src\*.obj"
 )
 

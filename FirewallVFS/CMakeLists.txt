@@ -48,6 +48,11 @@ if(MSVC)
     target_link_options(FirewallVFS PRIVATE /DEF:${CMAKE_SOURCE_DIR}/src/FirewallVFS.def)
 endif()
 
+add_custom_command(TARGET FirewallVFS POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E remove -f "${CMAKE_SOURCE_DIR}/../FirewallVFS.lib" "${CMAKE_SOURCE_DIR}/../FirewallVFS.exp"
+    COMMENT "Cleaning up .lib and .exp files"
+)
+
 foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})
     string(TOUPPER ${CONFIG} CONFIG_UPPER)
     set_target_properties(FirewallVFS PROPERTIES
