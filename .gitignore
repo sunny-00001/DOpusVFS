@@ -44,3 +44,24 @@ node_modules/
 
 # Windows reserved names
 nul
+
+# IDE/Editor temp files
+.workbuddy/
+*.swp
+*.swo
+*~
+
+# Test temp files
+test_*.exe
+Test*.exe
+
+# Deployment temp files
+deploy*.bat
+final_*.bat
+redeploy.bat
+restart_*.bat
+
+# Dialog test files
+test_dialog*.ps1
+test_resource.ps1
+capture_debug.ps1
