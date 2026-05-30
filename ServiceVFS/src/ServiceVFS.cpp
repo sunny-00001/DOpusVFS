@@ -15,8 +15,8 @@ typedef const BYTE* LPCBYTE;
 #pragma comment(lib, "Gdi32.lib")
 
 #define DOPUS_PLUGIN_HELPER
-#include "headers/vfs plugins.h"
-#include "headers/plugin support.h"
+#include "vfs_plugins.h"
+#include "plugin_support.h"
 #include "resource.h"
 
 static HMODULE g_hModule = NULL;

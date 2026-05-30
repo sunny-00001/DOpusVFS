@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include <functional>
-#include "headers/vfs plugins.h"
+#include "vfs_plugins.h"
 
 enum class PathType {
     RCLONE_VIRTUAL,

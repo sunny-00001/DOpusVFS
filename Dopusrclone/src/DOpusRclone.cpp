@@ -6,6 +6,11 @@
 #include <thread>
 #include <chrono>
 #include <atomic>
+
+#ifndef LPCBYTE
+typedef const BYTE* LPCBYTE;
+#endif
+
 #include "resource.h"
 
 #pragma comment(lib, "User32.lib")
@@ -14,8 +19,8 @@
 #pragma comment(lib, "Comdlg32.lib")
 
 #define DOPUS_PLUGIN_HELPER
-#include "headers/vfs plugins.h"
-#include "headers/plugin support.h"
+#include "vfs_plugins.h"
+#include "plugin_support.h"
 #include "RcloneClient.h"
 #include "Utils.h"
 

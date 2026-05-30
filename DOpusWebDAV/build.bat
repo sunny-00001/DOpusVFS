@@ -1,89 +1,64 @@
 @echo off
 setlocal enabledelayedexpansion
 
-echo Building DOpusWebDAV Plugin for Directory Opus
-echo ==============================================
+echo ========================================
+echo DOpusWebDAV Plugin Build Script v2.0
+echo ========================================
+echo.
 
-set SRCDIR=%~dp0
-set ROOTDIR=%SRCDIR%..
-set OUTDIR=%ROOTDIR%
+set PLUGINDIR=%~dp0
+set SRCDIR=%PLUGINDIR%src
+set OUTDIR=%PLUGINDIR%..
 
-set VCVARSALL=C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvarsall.bat
+echo Setting up Visual Studio environment...
+call "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" x64 >nul 2>&1
 
-if exist "%VCVARSALL%" (
-    echo Setting up Visual Studio environment...
-    call "%VCVARSALL%" x64
-) else (
-    echo WARNING: vcvarsall.bat not found
-    echo Checking if cl.exe is already in PATH...
-    where cl.exe
-    if errorlevel 1 (
-        echo ERROR: Visual Studio compiler ^(cl.exe^) not found
-        echo Please install Visual Studio Build Tools or run from Developer Command Prompt
-        pause
-        exit /b 1
-    )
+if %ERRORLEVEL% NEQ 0 (
+    echo Failed to set up Visual Studio environment
+    exit /b 1
 )
 
 echo.
-echo Output directory: %OUTDIR%
-
 echo Compiling resource file...
+echo.
+
+cd /d "%SRCDIR%"
+
 rc.exe /nologo resource.rc
-if %ERRORLEVEL% NEQ 0 (
-    echo Resource compilation failed
-    set RESFILE=
-) else (
-    set RESFILE=resource.res
-)
 
+echo.
 echo Compiling DOpusWebDAV.dll...
+echo.
 
-cl.exe /MT /O2 /EHsc /std:c++17 /utf-8 /LD DOpusWebDAV.cpp WebDAVClient.cpp pugixml.cpp %RESFILE% /I "headers" /DUNICODE /D_UNICODE /DWIN32_LEAN_AND_MEAN /DDOPUS_PLUGIN_HELPER /DVFSPLUGINVERSION=2 /link /DEF:DOpusWebDAV.def /NOIMPLIB Winhttp.lib Crypt32.lib Credui.lib Shell32.lib /OUT:"%OUTDIR%\DOpusWebDAV.dll"
+set SOURCES=DOpusWebDAV.cpp WebDAVClient.cpp pugixml.cpp
+set INCLUDES=/I"%PLUGINDIR%include"
+set DEFINES=/DUNICODE /D_UNICODE /DWIN32_LEAN_AND_MEAN /DDOPUS_PLUGIN_HELPER /DVFSPLUGINVERSION=2
+set CXXFLAGS=/nologo /W3 /O2 /EHsc /MT /LD /std:c++17 /utf-8
+set LIBS=Winhttp.lib Crypt32.lib Credui.lib Shell32.lib User32.lib Advapi32.lib
+set OUTFILE=%OUTDIR%\DOpusWebDAV.dll
 
-if errorlevel 1 (
-    echo.
-    echo ========================================
-    echo Build failed! Please check the error messages above.
-    echo ========================================
-    REM 即使失败也尝试清理临时文件
-    if exist "%SRCDIR%\*.obj" del /Q "%SRCDIR%\*.obj"
-    if exist "%SRCDIR%\*.exp" del /Q "%SRCDIR%\*.exp"
-    if exist "%SRCDIR%\*.lib" del /Q "%SRCDIR%\*.lib"
-    if exist "%SRCDIR%\*.res" del /Q "%SRCDIR%\*.res"
-    if exist "%OUTDIR%\DOpusWebDAV.exp" del /Q "%OUTDIR%\DOpusWebDAV.exp"
-    if exist "%OUTDIR%\DOpusWebDAV.lib" del /Q "%OUTDIR%\DOpusWebDAV.lib"
-) else (
+cl.exe %CXXFLAGS% %INCLUDES% %DEFINES% %SOURCES% /Fe"%OUTFILE%" /link /DEF:DOpusWebDAV.def %LIBS% resource.res
+
+if %ERRORLEVEL% EQU 0 (
+    del /q "%OUTDIR%\DOpusWebDAV.exp" 2>nul
+    del /q "%OUTDIR%\DOpusWebDAV.lib" 2>nul
+    
+    del /q "%SRCDIR%\*.obj" 2>nul
+    
     echo.
     echo ========================================
     echo Build successful!
-    echo Output: %OUTDIR%\DOpusWebDAV.dll
+    echo Output: %OUTFILE%
     echo ========================================
     
-    REM 清理临时文件
+    for %%F in ("%OUTFILE%") do echo Size: %%~zF bytes
     echo.
-    echo Cleaning up temporary files...
-    if exist "%SRCDIR%\*.obj" del /Q "%SRCDIR%\*.obj"
-    if exist "%SRCDIR%\*.exp" del /Q "%SRCDIR%\*.exp"
-    if exist "%SRCDIR%\*.lib" del /Q "%SRCDIR%\*.lib"
-    if exist "%SRCDIR%\*.res" del /Q "%SRCDIR%\*.res"
-    if exist "%OUTDIR%\DOpusWebDAV.exp" del /Q "%OUTDIR%\DOpusWebDAV.exp"
-    if exist "%OUTDIR%\DOpusWebDAV.lib" del /Q "%OUTDIR%\DOpusWebDAV.lib"
-    echo Temporary files cleaned up.
-    
-    if exist "%OUTDIR%\DOpusWebDAV.dll" (
-        echo.
-        echo File size:
-        for %%F in ("%OUTDIR%\DOpusWebDAV.dll") do echo   %%~zF bytes
-        
-        echo.
-        echo Automatically updating DOpus plugins...
-        if exist "%ROOTDIR%\update-dopus-plugins.bat" (
-            call "%ROOTDIR%\update-dopus-plugins.bat"
-        ) else (
-            echo update-dopus-plugins.bat not found, skipping auto-update
-        )
-    )
+) else (
+    echo.
+    echo ========================================
+    echo Build FAILED!
+    echo ========================================
 )
 
+cd /d "%PLUGINDIR%"
 endlocal

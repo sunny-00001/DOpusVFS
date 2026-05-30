@@ -4,8 +4,8 @@
 #include <shellapi.h>
 #include <commctrl.h>
 #define DOPUS_PLUGIN_HELPER
-#include "headers/vfs plugins.h"
-#include "headers/plugin support.h"
+#include "vfs_plugins.h"
+#include "plugin_support.h"
 #include "WebDAVClient.h"
 #include "resource.h"
 
@@ -40,22 +40,28 @@ static void LoadWebDAVConfig() {
     if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\DOpusWebDAV", 0, KEY_READ, &hKey) != ERROR_SUCCESS)
         return;
     DWORD dwVal = 0;
-    if (RegQueryValueExW(hKey, L"TimeoutSec", NULL, NULL, (LPBYTE)&dwVal, &(DWORD){sizeof(dwVal)}) == ERROR_SUCCESS && dwVal > 0)
+    DWORD dwSize = sizeof(dwVal);
+    if (RegQueryValueExW(hKey, L"TimeoutSec", NULL, NULL, (LPBYTE)&dwVal, &dwSize) == ERROR_SUCCESS && dwVal > 0)
         g_webdavConfig.timeoutSec = (int)dwVal;
     dwVal = 0;
-    if (RegQueryValueExW(hKey, L"VerifySSL", NULL, NULL, (LPBYTE)&dwVal, &(DWORD){sizeof(dwVal)}) == ERROR_SUCCESS)
+    dwSize = sizeof(dwVal);
+    if (RegQueryValueExW(hKey, L"VerifySSL", NULL, NULL, (LPBYTE)&dwVal, &dwSize) == ERROR_SUCCESS)
         g_webdavConfig.verifySSL = (dwVal != 0);
     dwVal = 0;
-    if (RegQueryValueExW(hKey, L"FollowRedirects", NULL, NULL, (LPBYTE)&dwVal, &(DWORD){sizeof(dwVal)}) == ERROR_SUCCESS)
+    dwSize = sizeof(dwVal);
+    if (RegQueryValueExW(hKey, L"FollowRedirects", NULL, NULL, (LPBYTE)&dwVal, &dwSize) == ERROR_SUCCESS)
         g_webdavConfig.followRedirects = (dwVal != 0);
     dwVal = 0;
-    if (RegQueryValueExW(hKey, L"UploadChunkKB", NULL, NULL, (LPBYTE)&dwVal, &(DWORD){sizeof(dwVal)}) == ERROR_SUCCESS && dwVal > 0)
+    dwSize = sizeof(dwVal);
+    if (RegQueryValueExW(hKey, L"UploadChunkKB", NULL, NULL, (LPBYTE)&dwVal, &dwSize) == ERROR_SUCCESS && dwVal > 0)
         g_webdavConfig.uploadChunkKB = (int)dwVal;
     dwVal = 0;
-    if (RegQueryValueExW(hKey, L"ShowHidden", NULL, NULL, (LPBYTE)&dwVal, &(DWORD){sizeof(dwVal)}) == ERROR_SUCCESS)
+    dwSize = sizeof(dwVal);
+    if (RegQueryValueExW(hKey, L"ShowHidden", NULL, NULL, (LPBYTE)&dwVal, &dwSize) == ERROR_SUCCESS)
         g_webdavConfig.showHidden = (dwVal != 0);
     dwVal = 0;
-    if (RegQueryValueExW(hKey, L"VerboseLog", NULL, NULL, (LPBYTE)&dwVal, &(DWORD){sizeof(dwVal)}) == ERROR_SUCCESS)
+    dwSize = sizeof(dwVal);
+    if (RegQueryValueExW(hKey, L"VerboseLog", NULL, NULL, (LPBYTE)&dwVal, &dwSize) == ERROR_SUCCESS)
         g_webdavConfig.verboseLog = (dwVal != 0);
     RegCloseKey(hKey);
 }

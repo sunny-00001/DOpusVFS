@@ -10,17 +10,15 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Rclone VFS"
 FONT 9, "Microsoft YaHei UI"
 BEGIN
-    DEFPUSHBUTTON   "确定", IDOK, 208, 244, 50, 12
-    PUSHBUTTON      "取消", IDCANCEL, 262, 244, 50, 12
-    PUSHBUTTON      "应用", IDC_RCLONE_APPLY, 154, 244, 50, 12
+    DEFPUSHBUTTON   "OK", IDOK, 208, 244, 50, 12
+    PUSHBUTTON      "Cancel", IDCANCEL, 262, 244, 50, 12
+    PUSHBUTTON      "Apply", IDC_RCLONE_APPLY, 154, 244, 50, 12
     LISTBOX         IDC_RCLONE_NAV_LIST, 4, 4, 36, 236, LBS_NOINTEGRALHEIGHT | LBS_OWNERDRAWFIXED | WS_VSCROLL | WS_TABSTOP
-    // Page 0: Paths
     LTEXT           "", IDC_RCLONE_LBL_EXE, 44, 8, 80, 8
     EDITTEXT        IDC_RCLONE_EXE_PATH, 44, 16, 180, 10, ES_AUTOHSCROLL
     PUSHBUTTON      "...", IDC_RCLONE_BROWSE_EXE, 230, 16, 26, 10
     LTEXT           "", IDC_RCLONE_LBL_REMOTE, 44, 32, 80, 8
     EDITTEXT        IDC_RCLONE_DEFAULT_REMOTE, 44, 40, 120, 10, ES_AUTOHSCROLL
-    // Page 1: Behavior
     LTEXT           "", IDC_RCLONE_LBL_CACHE, 44, 8, 80, 8
     EDITTEXT        IDC_RCLONE_CACHE_TIMEOUT, 44, 16, 60, 10, ES_AUTOHSCROLL | ES_NUMBER
     LTEXT           "", IDC_RCLONE_LBL_UPLOAD, 44, 30, 80, 8
@@ -36,16 +34,16 @@ END
 
 IDD_RCLONE_ABOUT DIALOGEX 0, 0, 300, 180
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "关于 Rclone VFS"
+CAPTION "About Rclone VFS"
 FONT 9, "Microsoft YaHei UI"
 BEGIN
-    DEFPUSHBUTTON   "确定", IDOK, 125, 159, 50, 14
+    DEFPUSHBUTTON   "OK", IDOK, 125, 159, 50, 14
     LTEXT           "Rclone VFS", IDC_STATIC, 60, 20, 200, 16
-    LTEXT           "版本 1.0.0", IDC_STATIC, 60, 40, 200, 12
-    LTEXT           "云存储虚拟文件系统 (Rclone)", IDC_STATIC, 60, 55, 200, 12
-    LTEXT           "用于 Directory Opus", IDC_STATIC, 60, 70, 200, 12
-    GROUPBOX        "功能", IDC_STATIC, 7, 90, 286, 60
-    LTEXT           "• 通过 Rclone 浏览远程存储", IDC_STATIC, 15, 105, 270, 12
-    LTEXT           "• 上传/下载/管理云端文件", IDC_STATIC, 15, 120, 270, 12
-    LTEXT           "• 支持主流云存储服务", IDC_STATIC, 15, 135, 270, 12
+    LTEXT           "Version 1.0.0", IDC_STATIC, 60, 40, 200, 12
+    LTEXT           "Cloud Storage VFS (Rclone)", IDC_STATIC, 60, 55, 200, 12
+    LTEXT           "For Directory Opus", IDC_STATIC, 60, 70, 200, 12
+    GROUPBOX        "Features", IDC_STATIC, 7, 90, 286, 60
+    LTEXT           "- Browse remote storage via Rclone", IDC_STATIC, 15, 105, 270, 12
+    LTEXT           "- Upload/download/manage cloud files", IDC_STATIC, 15, 120, 270, 12
+    LTEXT           "- Support major cloud storage services", IDC_STATIC, 15, 135, 270, 12
 END

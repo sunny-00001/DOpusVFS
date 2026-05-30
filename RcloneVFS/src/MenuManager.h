@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 #include "DataStructs.h"
-#include "headers/vfs plugins.h"
+#include "vfs_plugins.h"
 
 struct MenuContext {
     bool isRoot;

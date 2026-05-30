@@ -2,18 +2,16 @@
 setlocal enabledelayedexpansion
 
 echo ========================================
-echo DOpusRclone VFS Plugin Build Script
+echo DOpusRclone VFS Plugin Build Script v2.0
 echo ========================================
 echo.
 
-set SRCDIR=%~dp0
-set ROOTDIR=%SRCDIR%..
-set OUTDIR=%ROOTDIR%
-
-if not exist "%OUTDIR%" mkdir "%OUTDIR%"
+set PLUGINDIR=%~dp0
+set SRCDIR=%PLUGINDIR%src
+set OUTDIR=%PLUGINDIR%..
 
 echo Setting up Visual Studio environment...
-call "C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
+call "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" x64 >nul 2>&1
 
 if %ERRORLEVEL% NEQ 0 (
     echo Failed to set up Visual Studio environment
@@ -25,71 +23,42 @@ echo Compiling resource file...
 echo.
 
 cd /d "%SRCDIR%"
-rc.exe /nologo resource.rc
-if %ERRORLEVEL% NEQ 0 (
-    echo Resource compilation failed
-    set RESFILE=
-) else (
-    set RESFILE=resource.res
-)
+
+rc.exe /nologo resource.rc >nul 2>&1
 
 echo.
 echo Compiling DOpusRclone.dll...
 echo.
 
 set SOURCES=DOpusRclone.cpp RcloneClient.cpp
-set INCLUDES=/I"headers"
-set DEFINES=/DUNICODE /D_UNICODE /DWIN32_LEAN_AND_MEAN /DDOPUS_PLUGIN_HELPER
-set CXXFLAGS=/nologo /W3 /O2 /EHsc /MT /LD
+set INCLUDES=/I"%PLUGINDIR%include"
+set DEFINES=/DUNICODE /D_UNICODE /DWIN32_LEAN_AND_MEAN /DDOPUS_PLUGIN_HELPER /DVFSPLUGINVERSION=2
+set CXXFLAGS=/nologo /W3 /O2 /EHsc /MT /LD /utf-8
 set LIBS=Shell32.lib User32.lib Advapi32.lib Winhttp.lib Ole32.lib Crypt32.lib
 set OUTFILE=%OUTDIR%\DOpusRclone.dll
 
-cl.exe %CXXFLAGS% %INCLUDES% %DEFINES% %SOURCES% %RESFILE% /Fe"%OUTFILE%" /link /DEF:DOpusRclone.def /NOIMPLIB %LIBS%
+cl.exe %CXXFLAGS% %INCLUDES% %DEFINES% %SOURCES% /Fe"%OUTFILE%" /link /DEF:DOpusRclone.def %LIBS% resource.res
 
 if %ERRORLEVEL% EQU 0 (
+    del /q "%OUTDIR%\DOpusRclone.exp" 2>nul
+    del /q "%OUTDIR%\DOpusRclone.lib" 2>nul
+    
+    del /q "%SRCDIR%\*.obj" 2>nul
+    
     echo.
     echo ========================================
     echo Build successful!
     echo Output: %OUTFILE%
     echo ========================================
     
-    REM 清理临时文件
+    for %%F in ("%OUTFILE%") do echo Size: %%~zF bytes
     echo.
-    echo Cleaning up temporary files...
-    if exist "%SRCDIR%\*.obj" del /Q "%SRCDIR%\*.obj"
-    if exist "%SRCDIR%\*.exp" del /Q "%SRCDIR%\*.exp"
-    if exist "%SRCDIR%\*.lib" del /Q "%SRCDIR%\*.lib"
-    if exist "%SRCDIR%\*.res" del /Q "%SRCDIR%\*.res"
-    if exist "%OUTDIR%\DOpusRclone.exp" del /Q "%OUTDIR%\DOpusRclone.exp"
-    if exist "%OUTDIR%\DOpusRclone.lib" del /Q "%OUTDIR%\DOpusRclone.lib"
-    echo Temporary files cleaned up.
-    
-    if exist "%OUTFILE%" (
-        echo.
-        echo File size:
-        for %%F in ("%OUTFILE%") do echo   %%~zF bytes
-        
-        echo.
-        echo Automatically updating DOpus plugins...
-        if exist "%ROOTDIR%\update-dopus-plugins.bat" (
-            call "%ROOTDIR%\update-dopus-plugins.bat"
-        ) else (
-            echo update-dopus-plugins.bat not found, skipping auto-update
-        )
-    )
 ) else (
     echo.
     echo ========================================
     echo Build FAILED!
     echo ========================================
-    REM 即使失败也尝试清理临时文件
-    if exist "%SRCDIR%\*.obj" del /Q "%SRCDIR%\*.obj"
-    if exist "%SRCDIR%\*.exp" del /Q "%SRCDIR%\*.exp"
-    if exist "%SRCDIR%\*.lib" del /Q "%SRCDIR%\*.lib"
-    if exist "%SRCDIR%\*.res" del /Q "%SRCDIR%\*.res"
-    if exist "%OUTDIR%\DOpusRclone.exp" del /Q "%OUTDIR%\DOpusRclone.exp"
-    if exist "%OUTDIR%\DOpusRclone.lib" del /Q "%OUTDIR%\DOpusRclone.lib"
 )
 
-cd /d "%SRCDIR%"
+cd /d "%PLUGINDIR%"
 endlocal

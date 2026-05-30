@@ -2,7 +2,7 @@
 #include <windows.h>
 #include <string>
 #include "DataStructs.h"
-#include "headers/vfs plugins.h"
+#include "vfs_plugins.h"
 
 class ColumnManager {
 public:

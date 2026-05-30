@@ -25,8 +25,8 @@ static void DebugLog(const char* fmt, ...) {
 #pragma comment(lib, "Shell32.lib")
 #pragma comment(lib, "Advapi32.lib")
 
-#include "headers/vfs plugins.h"
-#include "headers/plugin support.h"
+#include "vfs_plugins.h"
+#include "plugin_support.h"
 #include "resource.h"
 #include "RcloneClient.h"
 #include "DaemonManager.h"

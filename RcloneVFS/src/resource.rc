@@ -1,8 +1,8 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿#include "resource.h"
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿#include "resource.h"
 #include "windows.h"
 
-IDI_RCLONE        ICON "rclone.ico"
-IDI_RCLONE_SMALL  ICON "rclone.ico"
+IDI_RCLONE        ICON "../rclone.ico"
+IDI_RCLONE_SMALL  ICON "../rclone.ico"
 
 1 VERSIONINFO
 FILEVERSION 2,0,0,0
