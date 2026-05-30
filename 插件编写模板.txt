@@ -1,0 +1,5 @@
+1.写一个Windows服务插件，命名为ServiceVFS。
+2.参考Rclone插件、Dopusrclone插件等实现。
+3.要求有完整的文件处理、自定义列、右键菜单、配置对话框、关于对话框等，文字显示均为中文。
+4.将插件编译到根目录VFS文件夹，编译后只保留.dll文件，删除.exp和.lib文件
+5.调用update-dopus-plugins.bat，将插件替换到D:\Dopus\VFSPlugins

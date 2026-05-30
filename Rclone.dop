@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<toolbar version="12.23">
+<wallpaper enabled="yes" inheritable="yes" type="tile">
+<std_type>toolbar</std_type>
+</wallpaper>
+<buttons backcol="none" display="icon_and_label" textcol="none" type="toolbar">
+<button backcol="none" display="icon_and_label" textcol="none">
+<label>上传文件</label>
+<icon1>#upload</icon1>
+<function type="normal">
+<instruction>Rclone_Upload</instruction>
+</function>
+</button>
+<button backcol="none" display="icon_and_label" textcol="none">
+<label>下载文件</label>
+<icon1>#download</icon1>
+<function type="normal">
+<instruction>Rclone_Download</instruction>
+</function>
+</button>
+<button backcol="none" display="icon_and_label" textcol="none">
+<label>同步到云</label>
+<icon1>#sync</icon1>
+<function type="normal">
+<instruction>Rclone_SyncToRemote</instruction>
+</function>
+</button>
+<button backcol="none" display="icon_and_label" textcol="none">
+<label>从云同步</label>
+<icon1>#sync</icon1>
+<function type="normal">
+<instruction>Rclone_SyncFromRemote</instruction>
+</function>
+</button>
+<button backcol="none" display="icon_and_label" textcol="none">
+<label>复制路径</label>
+<icon1>#copy</icon1>
+<function type="normal">
+<instruction>Rclone_CopyPath</instruction>
+</function>
+</button>
+<button backcol="none" display="icon_and_label" textcol="none">
+<label>新建文件夹</label>
+<icon1>#newfolder</icon1>
+<function type="normal">
+<instruction>Rclone_NewFolder</instruction>
+</function>
+</button>
+<button backcol="none" display="icon_and_label" textcol="none">
+<label>刷新</label>
+<icon1>#refresh</icon1>
+<function type="normal">
+<instruction>Rclone_Refresh</instruction>
+</function>
+</button>
+<button backcol="none" display="icon_and_label" textcol="none">
+<label>配置rclone</label>
+<icon1>#settings</icon1>
+<function type="normal">
+<instruction>Rclone_Config</instruction>
+</function>
+</button>
+</buttons>
+</toolbar>

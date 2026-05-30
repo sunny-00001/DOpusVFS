@@ -1,0 +1,10 @@
+^D:\VFS\PROCESSVFS\BUILD\CMAKEFILES\498B9E7055FD30D297B35CFC275F8256\GENERATE.STAMP.RULE
+setlocal
+C:\Users\Administrator\AppData\Local\Programs\Python\Python314\Lib\site-packages\cmake\data\bin\cmake.exe -SD:/VFS/ProcessVFS -BD:/VFS/ProcessVFS/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file D:/VFS/ProcessVFS/build/ProcessVFS.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

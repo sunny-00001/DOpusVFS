@@ -1,0 +1,69 @@
+#include "resource.h"
+#include "windows.h"
+
+1 VERSIONINFO
+FILEVERSION 1,0,0,0
+PRODUCTVERSION 1,0,0,0
+FILEFLAGSMASK 0x3fL
+FILEFLAGS 0x0L
+FILEOS 0x4L
+FILETYPE 0x2L
+FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080404B0"
+        BEGIN
+            VALUE "CompanyName", "FirewallVFS"
+            VALUE "FileDescription", "Firewall VFS Plugin for Directory Opus"
+            VALUE "FileVersion", "1.0.0.0"
+            VALUE "InternalName", "FirewallVFS"
+            VALUE "LegalCopyright", "(c) 2026"
+            VALUE "OriginalFilename", "FirewallVFS.dll"
+            VALUE "ProductName", "Firewall VFS Plugin"
+            VALUE "ProductVersion", "1.0.0.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x804, 1200
+    END
+END
+
+IDD_FIREWALL_CONFIG DIALOGEX 0, 0, 380, 280
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Firewall VFS"
+FONT 9, "Microsoft YaHei UI", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK", IDOK, 215, 259, 75, 14
+    PUSHBUTTON      "Cancel", IDCANCEL, 298, 259, 75, 14
+
+    LISTBOX         IDC_NAV_LIST, 7, 7, 48, 245, LBS_NOINTEGRALHEIGHT | LBS_OWNERDRAWFIXED | WS_VSCROLL | WS_TABSTOP
+
+    CONTROL         "", IDC_SHOW_INBOUND, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 63, 9, 200, 8
+    CONTROL         "", IDC_SHOW_OUTBOUND, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 63, 21, 200, 8
+    CONTROL         "", IDC_SHOW_ENABLED, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 63, 33, 200, 8
+    CONTROL         "", IDC_SHOW_DISABLED, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 63, 45, 200, 8
+    LTEXT           "", IDC_LBL_FILTER_PROFILE, 63, 57, 80, 8
+    COMBOBOX        IDC_FILTER_PROFILE, 63, 67, 100, 100, CBS_DROPDOWNLIST | WS_TABSTOP
+
+    LTEXT           "", IDC_LBL_COLUMNS, 63, 9, 80, 8
+    CONTROL         "", IDC_COL_DIRECTION, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 63, 21, 120, 8
+    CONTROL         "", IDC_COL_ACTION, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 63, 33, 120, 8
+    CONTROL         "", IDC_COL_PROTOCOL, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 63, 45, 120, 8
+    CONTROL         "", IDC_COL_ENABLED, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 63, 57, 120, 8
+    CONTROL         "", IDC_COL_PROFILE, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 63, 69, 120, 8
+    CONTROL         "", IDC_COL_LOCALPORT, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 63, 81, 120, 8
+    CONTROL         "", IDC_COL_REMOTEPORT, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 63, 93, 120, 8
+    CONTROL         "", IDC_COL_LOCALADDR, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 200, 21, 120, 8
+    CONTROL         "", IDC_COL_REMOTEADDR, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 200, 33, 120, 8
+    CONTROL         "", IDC_COL_PROGRAM, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 200, 45, 120, 8
+    CONTROL         "", IDC_COL_SERVICE, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 200, 57, 120, 8
+    CONTROL         "", IDC_COL_DESCRIPTION, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 200, 69, 120, 8
+
+    LTEXT           "", IDC_LBL_CACHE_TIMEOUT, 63, 9, 80, 8
+    EDITTEXT        IDC_CACHE_TIMEOUT, 63, 19, 80, 10, ES_AUTOHSCROLL | ES_NUMBER
+
+    PUSHBUTTON      "WF", IDC_OPEN_WF, 7, 259, 50, 14
+    PUSHBUTTON      "Reset", IDC_RESET_DEFAULTS, 62, 259, 50, 14
+END

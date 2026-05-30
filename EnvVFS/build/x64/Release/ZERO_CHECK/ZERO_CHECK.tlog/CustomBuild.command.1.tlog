@@ -1,0 +1,10 @@
+^D:\VFS\ENVVFS\BUILD\CMAKEFILES\0481B230BF59A74F88F0DD5D7D138F8E\GENERATE.STAMP.RULE
+setlocal
+C:\Users\Administrator\AppData\Local\Programs\Python\Python314\Lib\site-packages\cmake\data\bin\cmake.exe -SD:/VFS/EnvVFS -BD:/VFS/EnvVFS/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file D:/VFS/EnvVFS/build/EnvVFS.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

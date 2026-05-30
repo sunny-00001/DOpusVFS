@@ -1,0 +1,46 @@
+# Build outputs
+*.dll
+*.exe
+*.obj
+*.lib
+*.exp
+*.map
+*.res
+*.pdb
+*.ilk
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+*.vcxproj
+*.vcxproj.filters
+*.sln
+*.slnx
+.ninja_deps
+.ninja_log
+build.ninja
+
+# IDE
+.vs/
+*.user
+*.suo
+*.sdf
+*.opensdf
+ipch/
+
+# Logs and temp files
+*.log
+debug.log
+RCa*
+
+# Backup files
+*.bak
+*.bak2
+*.bak3
+
+# Dependencies
+node_modules/
+
+# Windows reserved names
+nul

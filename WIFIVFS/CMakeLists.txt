@@ -1,0 +1,56 @@
+cmake_minimum_required(VERSION 3.16)
+project(WIFIVFS VERSION 1.0.0 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS OFF)
+
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
+
+add_library(WIFIVFS SHARED
+    src/WIFIVFS.cpp
+    resource.rc
+)
+
+target_include_directories(WIFIVFS PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+)
+
+target_compile_definitions(WIFIVFS PRIVATE
+    UNICODE
+    _UNICODE
+    WIN32_LEAN_AND_MEAN
+    DOPUS_PLUGIN_HELPER
+    VFSPLUGINVERSION=2
+    _CRT_SECURE_NO_WARNINGS
+)
+
+target_link_libraries(WIFIVFS PRIVATE
+    advapi32
+    Shell32
+    Comctl32
+)
+
+set_target_properties(WIFIVFS PROPERTIES
+    OUTPUT_NAME "WIFIVFS"
+    PREFIX ""
+    SUFFIX ".dll"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/.."
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/.."
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/.."
+)
+
+if(MSVC)
+    target_compile_options(WIFIVFS PRIVATE /W4 /utf-8)
+    target_link_options(WIFIVFS PRIVATE /DEF:${CMAKE_SOURCE_DIR}/WIFIVFS.def)
+endif()
+
+foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})
+    string(TOUPPER ${CONFIG} CONFIG_UPPER)
+    set_target_properties(WIFIVFS PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY_${CONFIG_UPPER} "${CMAKE_SOURCE_DIR}/.."
+        LIBRARY_OUTPUT_DIRECTORY_${CONFIG_UPPER} "${CMAKE_SOURCE_DIR}/.."
+        ARCHIVE_OUTPUT_DIRECTORY_${CONFIG_UPPER} "${CMAKE_SOURCE_DIR}/.."
+    )
+endforeach()

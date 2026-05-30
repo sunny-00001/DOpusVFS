@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<toolbar>
+	<image_settings fill="none" fit="0x408" image="" inheritable="yes" opacity="100" use_custom="no" />
+	<buttons backcol="none" display="icon" textcol="none" type="menu">
+		<button backcol="none" display="icon" textcol="none">
+			<label>启动服务</label>
+			<tip>启动选中的服务</tip>
+			<icon1>#Win11theme:media_play</icon1>
+			<function type="normal">
+				<instruction>@nodeselect</instruction>
+				<instruction>ServiceStart</instruction>
+			</function>
+		</button>
+		<button backcol="none" display="icon" textcol="none">
+			<label>停止服务</label>
+			<tip>停止选中的服务</tip>
+			<icon1>#Win11theme:media_stop</icon1>
+			<function type="normal">
+				<instruction>@nodeselect</instruction>
+				<instruction>ServiceStop</instruction>
+			</function>
+		</button>
+		<button backcol="none" display="icon" textcol="none">
+			<label>暂停服务</label>
+			<tip>暂停选中的服务</tip>
+			<icon1>#Win11theme:media_pause</icon1>
+			<function type="normal">
+				<instruction>@nodeselect</instruction>
+				<instruction>ServicePause</instruction>
+			</function>
+		</button>
+		<button backcol="none" display="icon" textcol="none">
+			<label>继续服务</label>
+			<tip>继续选中的服务</tip>
+			<icon1>#Win11theme:media_resume</icon1>
+			<function type="normal">
+				<instruction>@nodeselect</instruction>
+				<instruction>ServiceResume</instruction>
+			</function>
+		</button>
+		<button backcol="none" display="icon" textcol="none" type="separator">
+		</button>
+		<button backcol="none" display="icon" textcol="none">
+			<label>重启服务</label>
+			<tip>重启选中的服务</tip>
+			<icon1>#Win11theme:refresh</icon1>
+			<function type="normal">
+				<instruction>@nodeselect</instruction>
+				<instruction>ServiceRestart</instruction>
+			</function>
+		</button>
+		<button backcol="none" display="icon" textcol="none">
+			<label>刷新服务</label>
+			<tip>刷新服务状态</tip>
+			<icon1>#Win11theme:nav_refresh</icon1>
+			<function type="normal">
+				<instruction>@nodeselect</instruction>
+				<instruction>ServiceRefresh</instruction>
+			</function>
+		</button>
+		<button backcol="none" display="icon" textcol="none">
+			<label>服务属性</label>
+			<tip>查看服务属性</tip>
+			<icon1>#Win11theme:properties</icon1>
+			<function type="normal">
+				<instruction>@nodeselect</instruction>
+				<instruction>ServiceProperties</instruction>
+			</function>
+		</button>
+	</buttons>
+</toolbar>

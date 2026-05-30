@@ -1,0 +1,13 @@
+@echo off
+echo Stopping DOpus...
+taskkill /f /im dopus.exe 2>nul
+taskkill /f /im dopusrt.exe 2>nul
+echo Waiting 5 seconds...
+timeout /t 5 /nobreak >nul
+echo Deleting old DLL...
+del /f "D:\Dopus\VFSPlugins\WIFIVFS.dll" 2>nul
+echo Copying new DLL...
+copy /y "d:\VFS\WIFIVFS.dll" "D:\Dopus\VFSPlugins\WIFIVFS.dll"
+echo Done!
+dir "D:\Dopus\VFSPlugins\WIFIVFS.dll"
+pause

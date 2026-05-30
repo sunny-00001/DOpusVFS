@@ -1,0 +1,172 @@
+i'm not 100% sure this is all that's needed, but try implementing VFS_GetAllCustomColumnsW, which is similar to VFS_GetCustomColumnsW, and returns the same type of data, but doesn't take any arguments and should return a list of all columns the plugin can display.
+
+The main difference is VFS_GetCustomColumnsW takes a VFS Data handle and only lists the columns which are valid for a given directory, while VFS_GetAllCustomColumnsW returns all of the plugin's columns.
+
+VFS_GetAllCustomColumnsW
+
+In the Archives plugin's case, both functions return the same data, since the plugin always offers the same columns for every path it handles.
+
+Exported functions:
+
+__declspec(dllexport) LPVFSCUSTOMCOLUMN VFS_GetCustomColumnsW(HANDLE hVFSData);
+__declspec(dllexport) LPVFSCUSTOMCOLUMN VFS_GetAllCustomColumnsW();
+
+Function implementations:
+
+LPVFSCUSTOMCOLUMN VFS_GetCustomColumnsW(HANDLE hVFSData)
+{
+	O7Z_LOGF(L"", L"VFS_GetCustomColumnsW", L"Calling on %p...", hVFSData);
+	return const_cast< VFSCUSTOMCOLUMN * >( Opus7ZipColumns::GetVfsColumns() );
+}
+
+LPVFSCUSTOMCOLUMN VFS_GetAllCustomColumnsW()
+{
+	O7Z_LOG(L"", L"VFS_GetAllCustomColumnsW", L"Calling...");
+	return const_cast< VFSCUSTOMCOLUMN * >( Opus7ZipColumns::GetVfsColumns() );
+}
+
+Underlying details (header):
+
+#pragma once
+
+class Opus7ZipColumns
+{
+public:
+	enum
+	{
+		O7ZCOLUMN_PACKED,
+		O7ZCOLUMN_RATIO,
+		O7ZCOLUMN_CRC,
+		O7ZCOLUMN_BLOCK,
+		O7ZCOLUMN_INDEX,
+		O7ZCOLUMN_SOLID,
+		O7ZCOLUMN_METHOD,
+		O7ZCOLUMN_MODE,
+		O7ZCOLUMN_LINK,
+		O7ZCOLUMN_USER,
+		O7ZCOLUMN_GROUP,
+
+		O7ZCOLUMN__COUNT
+	};
+
+	static void StaticInit(DOpusPluginHelperOpus7ZipPlugin *pHelper);
+	static void StaticUninit();
+	static const VFSCUSTOMCOLUMN * GetVfsColumns();
+
+private:
+	class Column
+	{
+	public:
+		// szLabel can be temporary as it will be copied.
+		// szKey must be static as the literal pointer will be stored.
+		Column(const wchar_t *szLabel, const wchar_t *szKey, DWORD dwFlags, int iID);
+		~Column(); // non-virtual
+
+		void Link(Column *pNext);
+
+		const VFSCUSTOMCOLUMN *GetVfsColumn() const { return &m_vfsColumn; }
+
+	private:
+		VFSCUSTOMCOLUMN m_vfsColumn;
+		std::wstring m_strLabel; // We store a copy of the string since we cannot depend on the plugin's main string cache to exist within this class.
+
+		Column(const Column &rhs); // disallow
+		Column &operator=(const Column &rhs); // disallow
+	};
+
+	static std::vector< Column * > s_vecColumns;
+
+private:
+	Opus7ZipColumns(); // disallow (this class is static-only)
+	~Opus7ZipColumns(); // disallow (this class is static-only)
+	Opus7ZipColumns(const Opus7ZipColumns &rhs); // disallow
+	Opus7ZipColumns &operator=(const Opus7ZipColumns &rhs); // disallow
+};
+
+Underlying details (code):
+
+#include "StdAfx.h"
+
+std::vector< Opus7ZipColumns::Column * > Opus7ZipColumns::s_vecColumns(O7ZCOLUMN__COUNT);
+
+Opus7ZipColumns::Column::Column(const wchar_t *szLabel, const wchar_t *szKey, DWORD dwFlags, int iID)
+: m_strLabel(szLabel)
+{
+	ZeroMemory(&m_vfsColumn, sizeof(m_vfsColumn));
+	m_vfsColumn.cbSize    = sizeof(m_vfsColumn);
+	m_vfsColumn.lpNext    = NULL; // Will be linked in later unless this is the last one.
+	m_vfsColumn.lpszLabel = const_cast< wchar_t * >( m_strLabel.c_str() );
+	m_vfsColumn.lpszKey   = const_cast< wchar_t * >( szKey );
+	m_vfsColumn.dwFlags   = dwFlags;
+	m_vfsColumn.iID       = iID;
+}
+
+Opus7ZipColumns::Column::~Column()
+{
+}
+
+void Opus7ZipColumns::Column::Link(Column *pNext)
+{
+	if (pNext == NULL)
+	{
+		m_vfsColumn.lpNext = NULL;
+	}
+	else
+	{
+		m_vfsColumn.lpNext = const_cast< VFSCUSTOMCOLUMN * >( pNext->GetVfsColumn() );
+	}
+}
+
+// Must be called in VFS_Init if the plugin is being initialised for the first time.
+void Opus7ZipColumns::StaticInit(DOpusPluginHelperOpus7ZipPlugin *pHelper)
+{
+	StaticUninit();
+
+	LeoHelpers::OpusStringLoader sl(pHelper);
+
+	// Opus automatically uses/requires the name of the DLL as a namespace prefix for column names
+	// in commands like "Set COLUMNSTOGGLE=opus7zip:packed" (for a plugin that is in opus7zip.dll).
+
+	s_vecColumns.push_back(new Column( sl.Get(STR_7Z_PROP_HEADING_PACKEDSIZE), L"packed", VFSCCF_RIGHTJUSTIFY|VFSCCF_SIZE,    O7ZCOLUMN_PACKED ));
+	s_vecColumns.push_back(new Column( sl.Get(STR_7Z_PROP_HEADING_RATIO),      L"ratio",  VFSCCF_RIGHTJUSTIFY|VFSCCF_PERCENT, O7ZCOLUMN_RATIO  ));
+	s_vecColumns.push_back(new Column( sl.Get(STR_7Z_PROP_HEADING_CRC),        L"crc",    VFSCCF_LEFTJUSTIFY,                 O7ZCOLUMN_CRC    ));
+	s_vecColumns.push_back(new Column( sl.Get(STR_7Z_PROP_HEADING_BLOCK),      L"block",  VFSCCF_RIGHTJUSTIFY|VFSCCF_NUMBER,  O7ZCOLUMN_BLOCK  ));
+	s_vecColumns.push_back(new Column( sl.Get(STR_7Z_PROP_HEADING_INDEX),      L"index",  VFSCCF_RIGHTJUSTIFY|VFSCCF_NUMBER,  O7ZCOLUMN_INDEX  ));
+	s_vecColumns.push_back(new Column( sl.Get(STR_7Z_PROP_HEADING_ISSOLID),    L"solid",  VFSCCF_LEFTJUSTIFY,                 O7ZCOLUMN_SOLID  ));
+	s_vecColumns.push_back(new Column( sl.Get(STR_7Z_PROP_HEADING_METHOD),     L"method", VFSCCF_LEFTJUSTIFY,                 O7ZCOLUMN_METHOD ));
+	s_vecColumns.push_back(new Column( sl.Get(STR_7Z_PROP_HEADING_MODE),       L"mode",   VFSCCF_LEFTJUSTIFY,                 O7ZCOLUMN_MODE   ));
+	s_vecColumns.push_back(new Column( sl.Get(STR_7Z_PROP_HEADING_LINK),       L"link",   VFSCCF_LEFTJUSTIFY,                 O7ZCOLUMN_LINK   ));
+	s_vecColumns.push_back(new Column( sl.Get(STR_7Z_PROP_HEADING_USER),       L"user",   VFSCCF_LEFTJUSTIFY,                 O7ZCOLUMN_USER   ));
+	s_vecColumns.push_back(new Column( sl.Get(STR_7Z_PROP_HEADING_GROUP),      L"group",  VFSCCF_LEFTJUSTIFY,                 O7ZCOLUMN_GROUP  ));
+
+	leoAssert(O7ZCOLUMN__COUNT == s_vecColumns.size());
+
+	std::vector< Opus7ZipColumns::Column * >::size_type iEnd = s_vecColumns.size() - 1;
+
+	for (std::vector< Opus7ZipColumns::Column * >::size_type iCurrent = 0; iCurrent < iEnd; ++iCurrent)
+	{
+		s_vecColumns[iCurrent]->Link(s_vecColumns[iCurrent+1]);
+
+		leoAssert(s_vecColumns[iCurrent]->GetVfsColumn()->iID == iCurrent);
+	}
+}
+
+// Must be called in VFS_Uninit if the plugin's reference count reaches zero.
+void Opus7ZipColumns::StaticUninit()
+{
+	while(!s_vecColumns.empty())
+	{
+		delete s_vecColumns.back();
+		s_vecColumns.pop_back();
+	}
+}
+
+const VFSCUSTOMCOLUMN * Opus7ZipColumns::GetVfsColumns()
+{
+	if (s_vecColumns.empty())
+	{
+		return NULL;
+	}
+
+	return s_vecColumns[0]->GetVfsColumn();
+}

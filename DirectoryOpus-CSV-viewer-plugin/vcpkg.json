@@ -1,0 +1,22 @@
+{
+  "vcpkg-configuration": {
+    "default-registry": {
+      "kind": "git",
+      "baseline": "ffffe619563988cbcfda2b8db2c142654d12eaf5",
+      "repository": "D:/vcpkg"
+    },
+    "overlay-triplets": [
+      "vcpkg/overlay_triplets"
+    ]
+  },
+
+  "dependencies": [
+    "boost-utility",
+    { "name": "boost-locale", "features": [ "icu" ] },
+    "boost-system",
+    "boost-preprocessor",
+    "boost-scope",
+    "wtl",
+    "rapidcsv"
+  ]
+}

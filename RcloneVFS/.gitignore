@@ -1,0 +1,24 @@
+# Build outputs
+*.obj
+*.dll
+*.pdb
+*.ilk
+*.exp
+*.lib
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.sln
+*.vcxproj
+*.vcxproj.filters
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Test files
+test/
+*.test

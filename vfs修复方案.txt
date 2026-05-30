@@ -1,0 +1,870 @@
+Directory Opus VFS 插件开发文档（更新版）
+目录
+
+    概述
+    环境准备
+    VFS 插件基础
+    插件开发流程
+    核心 API 说明
+    实际项目参考
+    完整示例代码
+    插件安装与分发
+    常见问题
+    学习资源
+    resource.dopus.com 社区资源
+    VFS 插件已知限制与常见问题
+    附录
+
+概述
+什么是 Directory Opus
+Directory Opus（简称 DOpus）是 Windows 平台上功能强大的文件管理器，由 GPSoftware 公司开发。它提供了远超 Windows 资源管理器的功能，包括双窗格、多标签、批量重命名、强大的搜索功能等。
+
+    官方网站: https://directory-opus.com/
+    官方手册: https://manual.dopus.net/（含中文翻译）
+    社区论坛: https://resource.dopus.com/（Discourse 平台，需注册登录）
+
+最新版本：Directory Opus 13.23 - 原生 64 位多线程性能，完整脚本接口
+
+    注意：GPSoftware 原域名 gpsoft.com.au 已不再使用，gpsoftware.com 域名已出售。
+
+什么是 VFS 插件
+VFS（Virtual File System，虚拟文件系统）插件是 Directory Opus 的一种扩展机制，允许第三方开发者添加对新文件系统或归档格式的支持。
+VFS 插件的主要用途：
+
+    添加对新归档格式的支持（如 7z、RAR、ISO 等）
+    实现自定义虚拟文件系统（如访问系统注册表、WebDAV、云存储等）
+    提供特殊文件类型的浏览和操作功能
+
+内置 VFS 示例：
+
+    File Collections（文件集合）- coll:// URL 协议
+    Libraries（库）- 虚拟合并多文件夹
+    Archives（归档文件）- Zip、RAR、7-zip 等
+    FTP - 远程 FTP 站点访问
+    MTP（媒体传输协议）- 手机、平板、相机等设备
+
+项目中的 VFS 插件资源
+本项目包含多个完整的 VFS 插件实现，可作为开发参考：
+表格
+项目	功能	路径前缀	技术栈	来源
+RegVFS	注册表访问	reg://	C++/CMake	本地
+DOpusWebDAV	WebDAV 支持	dav:///davs://	C++	本地
+directory_opus_amiga_plugin	Amiga ADF/HDF	-	C++	本地
+dopus-webdav-vfs	WebDAV 原生支持	dav:///davs://	C++/WinHTTP	社区 (calvin)
+rclone-vfs	Rclone 云存储	rclone://	C++	社区 (calvin)
+环境准备
+必要软件
+
+    Directory Opus - 安装最新版本
+    Visual Studio - 推荐 2019 或更高版本（用于 C++ 插件开发）
+    Opus Plugins SDK - 从 GPSoftware 官网下载页获取
+    CMake - 3.16+（推荐用于项目构建）
+
+SDK 安装
+SDK 包含：
+
+    头文件（opusplug.h, plugin_support.h, vfs_plugins.h, viewer_plugins.h）
+    库文件（.lib）
+    文档（modules.doc、hooks.doc 等）
+    示例代码（仅源文件，无 VS Solution）
+
+SDK 获取途径：
+
+    GPSoftware 官网下载（随 Directory Opus 安装目录提供）
+    论坛资源：resource.dopus.com 搜索 "Plugin SDK"
+    社区开源项目（如 dopus-webdav-vfs）中包含的 SDK 头文件
+
+项目中已包含 SDK 头文件，可参考以下位置：
+plaintext
+
+d:\VFS\RegVFS\include\           # RegVFS 使用的 SDK 头文件
+d:\VFS\DOpusWebDAV\headers\      # WebDAV VFS 使用的 SDK 头文件
+
+目录结构
+推荐的项目结构（基于 RegVFS）：
+plaintext
+
+MyVFSPlugin/
+├── include/                # SDK 头文件
+│   ├── opusplug.h
+│   ├── plugin_support.h
+│   └── vfs_plugins.h
+├── src/                    # 源代码
+│   ├── MyVFSPlugin.cpp     # 主程序
+│   ├── MyVFSPlugin.def     # DLL 导出定义
+│   ├── resource.rc         # 资源文件（可选）
+│   └── resource.h          # 资源头文件
+├── build/                  # 构建输出目录
+├── CMakeLists.txt          # CMake 构建配置
+├── build.bat               # 批处理构建脚本
+└── README.md               # 项目文档
+
+VFS 插件基础
+插件架构
+VFS 插件是标准的 Windows DLL，需要实现特定的导出函数来与 Opus 通信。每个插件可以通过以下两种方式之一被激活：
+
+    URL 前缀 - 如 reg://、dav://，当用户输入该前缀路径时激活
+    文件扩展名 - 如 .adf、.hdf，当用户尝试打开该扩展名的文件时激活
+
+关键概念
+基于真实 SDK 和项目实践的关键概念：
+
+    GUID - 每个插件需要唯一的 GUID 标识
+    导出函数 - 特定命名的函数，Opus 会调用这些函数
+    内存管理 - 使用 Opus 提供的 HeapAlloc 分配文件列表，Opus 负责释放
+    路径格式 - 使用 :// 前缀的 URL 风格路径，内部使用正斜杠
+    USB 模式 - 支持从 USB 设备运行 Opus，配置不写入注册表
+    取消事件 - hAbortEvent 用于检测用户是否取消操作
+    Unicode - 所有函数都有 W（宽字符）后缀，必须使用 Unicode
+
+插件开发流程
+1. 创建项目
+使用 Visual Studio 或 CMake 创建 DLL 项目。推荐使用 CMake 以便跨版本兼容。
+2. 包含 SDK 头文件
+cpp
+运行
+
+#include <windows.h>
+#include <strsafe.h>
+#include <shellapi.h>
+#define DOPUS_PLUGIN_HELPER
+#include "vfs_plugins.h"
+#include "plugin_support.h"
+
+3. 定义插件 GUID
+每个插件需要唯一的 GUID：
+cpp
+运行
+
+static const GUID GUIDPlugin_MyVFS = 
+{ 0x12345678, 0x1234, 0x5678, { 0x90, 0xAB, 0xCD, 0xEF, 0x12, 0x34, 0x56, 0x78 } };
+
+4. 实现导出函数
+必需的导出函数（基于 RegVFS）：
+cpp
+运行
+
+// 初始化/反初始化
+extern "C" __declspec(dllexport) BOOL VFS_Init(LPVFSINITDATA pInitData);
+extern "C" __declspec(dllexport) void VFS_Uninit();
+
+// 创建/销毁插件实例
+extern "C" __declspec(dllexport) HANDLE VFS_Create(LPGUID pGUID, HWND hwndMsgWindow);
+extern "C" __declspec(dllexport) void VFS_Destroy(HANDLE hVFSData);
+
+// 插件识别
+extern "C" __declspec(dllexport) BOOL VFS_IdentifyW(LPVFSPLUGININFOW lpVFSInfo);
+
+// 前缀列表
+extern "C" __declspec(dllexport) BOOL VFS_GetPrefixListW(LPWSTR lpszPrefix, int cchPrefixMax);
+
+// 目录操作
+extern "C" __declspec(dllexport) BOOL VFS_ReadDirectoryW(HANDLE hData, LPVFSFUNCDATA lpFuncData, LPVFSREADDIRDATAW lpRDD);
+extern "C" __declspec(dllexport) LPVFSFILEDATAHEADER VFS_GetFileInformationW(HANDLE hData, LPVFSFUNCDATA lpFuncData, LPWSTR lpszPath, HANDLE hHeap, DWORD dwFlags);
+extern "C" __declspec(dllexport) BOOL VFS_CreateDirectoryW(HANDLE hData, LPVFSFUNCDATA lpFuncData, LPWSTR lpszPath, DWORD dwFlags);
+extern "C" __declspec(dllexport) BOOL VFS_RemoveDirectoryW(HANDLE hData, LPVFSFUNCDATA lpFuncData, LPWSTR lpszPath, DWORD dwFlags);
+
+// 文件操作
+extern "C" __declspec(dllexport) HANDLE VFS_CreateFileW(HANDLE hData, LPVFSFUNCDATA lpFuncData, LPWSTR lpszFile, DWORD dwMode, DWORD dwFlagsAndAttr, DWORD dwFlags, LPFILETIME lpFT);
+extern "C" __declspec(dllexport) BOOL VFS_ReadFile(HANDLE hVFSData, LPVFSFUNCDATA lpFuncData, HANDLE hFile, LPVOID lpData, DWORD dwSize, LPDWORD lpdwReadSize);
+extern "C" __declspec(dllexport) BOOL VFS_WriteFile(HANDLE hVFSData, LPVFSFUNCDATA lpFuncData, HANDLE hFile, LPVOID lpData, DWORD dwSize, BOOL fFlush, LPDWORD lpdwWriteSize);
+extern "C" __declspec(dllexport) BOOL VFS_SeekFile(HANDLE hVFSData, LPVFSFUNCDATA lpFuncData, HANDLE hFile, __int64 iPos, DWORD dwMethod, DWORD dwFlags, unsigned __int64* piNewPos);
+extern "C" __declspec(dllexport) void VFS_CloseFile(HANDLE hVFSData, LPVFSFUNCDATA lpFuncData, HANDLE hFile);
+extern "C" __declspec(dllexport) BOOL VFS_DeleteFileW(HANDLE hData, LPVFSFUNCDATA lpFuncData, LPWSTR lpszFile, DWORD dwFlags, int iSecurePasses);
+
+// 文件操作（重命名、移动）
+extern "C" __declspec(dllexport) BOOL VFS_RenameFileW(HANDLE hData, LPVFSFUNCDATA lpFuncData, LPWSTR lpszOldName, LPWSTR lpszNewName);
+extern "C" __declspec(dllexport) BOOL VFS_MoveFileW(HANDLE hData, LPVFSFUNCDATA lpFuncData, LPWSTR lpszOldName, LPWSTR lpszNewName);
+
+// 路径处理
+extern "C" __declspec(dllexport) BOOL VFS_GetPathDisplayNameW(HANDLE hData, LPVFSFUNCDATA lpFuncData, LPWSTR lpszPath, LPWSTR lpszDisplayName, int cchDisplayNameMax);
+extern "C" __declspec(dllexport) BOOL VFS_GetPathParentRootW(HANDLE hData, LPVFSFUNCDATA lpFuncData, LPWSTR lpszPath, LPWSTR lpszParentRoot, int cchParentRootMax);
+
+// 属性和错误
+extern "C" __declspec(dllexport) BOOL VFS_PropGetW(HANDLE hData, vfsProperty propId, LPVOID lpPropData, LPVOID lpData1, LPVOID lpData2, LPVOID lpData3);
+extern "C" __declspec(dllexport) unsigned __int64 VFS_GetFileSizeW(HANDLE hData, LPVFSFUNCDATA lpFuncData, LPWSTR lpszFile, DWORD* pdwSizeHigh);
+extern "C" __declspec(dllexport) long VFS_GetLastError(HANDLE hData);
+
+// 配置和关于
+extern "C" __declspec(dllexport) void VFS_Configure(HWND hwndParent);
+extern "C" __declspec(dllexport) void VFS_About(HWND hwndParent);
+extern "C" __declspec(dllexport) BOOL VFS_USBSafe(void);
+
+// 上下文菜单（可选）
+extern "C" __declspec(dllexport) int VFS_ContextVerbW(HANDLE hData, LPVFSFUNCDATA lpFuncData, LPVFSCONTEXTVERBDATAW lpVerbData);
+
+5. 创建 DEF 文件
+RegistryVFS.def 示例：
+plaintext
+
+LIBRARY "RegistryVFS"
+EXPORTS
+    VFS_Init
+    VFS_Uninit
+    VFS_Create
+    VFS_Destroy
+    VFS_IdentifyW
+    VFS_GetPrefixListW
+    VFS_ReadDirectoryW
+    VFS_GetFileInformationW
+    VFS_CreateFileW
+    VFS_ReadFile
+    VFS_WriteFile
+    VFS_SeekFile
+    VFS_CloseFile
+    VFS_DeleteFileW
+    VFS_CreateDirectoryW
+    VFS_RemoveDirectoryW
+    VFS_RenameFileW
+    VFS_MoveFileW
+    VFS_GetPathDisplayNameW
+    VFS_GetPathParentRootW
+    VFS_PropGetW
+    VFS_GetFileSizeW
+    VFS_GetLastError
+    VFS_ContextVerbW
+    VFS_Configure
+    VFS_About
+    VFS_USBSafe
+
+6. 配置 CMakeLists.txt（推荐）
+基于 RegVFS 的 CMakeLists.txt：
+cmake
+
+cmake_minimum_required(VERSION 3.16)
+project(MyVFSPlugin VERSION 1.0.0 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS OFF)
+
+add_library(MyVFSPlugin SHARED
+    src/MyVFSPlugin.cpp
+)
+
+target_include_directories(MyVFSPlugin PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+)
+
+target_compile_definitions(MyVFSPlugin PRIVATE
+    UNICODE
+    _UNICODE
+    WIN32_LEAN_AND_MEAN
+    DOPUS_PLUGIN_HELPER
+    VFSPLUGINVERSION=2
+)
+
+target_link_libraries(MyVFSPlugin PRIVATE
+    advapi32      # 仅 RegVFS 需要
+    Shell32
+    Comctl32
+)
+
+set_target_properties(MyVFSPlugin PROPERTIES
+    OUTPUT_NAME "MyVFSPlugin"
+    PREFIX ""
+    SUFFIX ".dll"
+)
+
+if(MSVC)
+    target_compile_options(MyVFSPlugin PRIVATE /W4)
+    target_link_options(MyVFSPlugin PRIVATE /DEF:${CMAKE_SOURCE_DIR}/src/MyVFSPlugin.def)
+endif()
+
+7. 构建脚本（可选）
+build.bat 示例：
+batch
+
+@echo off
+setlocal enabledelayedexpansion
+
+echo ========================================
+echo My VFS Plugin Build Script
+echo ========================================
+echo.
+
+set SRCDIR=%~dp0
+set ROOTDIR=%SRCDIR%..
+set OUTDIR=%ROOTDIR%
+
+if not exist "%OUTDIR%" mkdir "%OUTDIR%"
+
+echo Setting up Visual Studio environment...
+call "C:\Program Files\Microsoft Visual Studio\18\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
+
+if %ERRORLEVEL% NEQ 0 (
+    echo Failed to set up Visual Studio environment
+    exit /b 1
+)
+
+echo.
+echo Compiling resource file...
+echo.
+
+cd /d "%SRCDIR%"
+
+rc.exe /nologo /I"include" /I"src" src\resource.rc
+
+if %ERRORLEVEL% NEQ 0 (
+    echo Resource compilation failed, continuing without resources...
+    set RESFILE=
+) else (
+    echo Resource compiled successfully.
+    set RESFILE=src\resource.res
+)
+
+echo.
+echo Compiling MyVFSPlugin.dll...
+echo.
+
+set SOURCES=src\MyVFSPlugin.cpp
+set INCLUDES=/I"include" /I"src"
+set DEFINES=/DUNICODE /D_UNICODE /DWIN32_LEAN_AND_MEAN /DDOPUS_PLUGIN_HELPER /DVFSPLUGINVERSION=2
+set CXXFLAGS=/nologo /W4 /O2 /EHsc /MD /LD /utf-8
+set LIBS=advapi32.lib Shell32.lib Comctl32.lib
+set OUTFILE=%OUTDIR%\MyVFSPlugin.dll
+
+if defined RESFILE (
+    cl.exe %CXXFLAGS% %INCLUDES% %DEFINES% %SOURCES% /Fe"%OUTFILE%" /link /DEF:src\MyVFSPlugin.def %LIBS% %RESFILE%
+) else (
+    cl.exe %CXXFLAGS% %INCLUDES% %DEFINES% %SOURCES% /Fe"%OUTFILE%" /link /DEF:src\MyVFSPlugin.def %LIBS%
+)
+
+if %ERRORLEVEL% EQU 0 (
+    echo.
+    echo ========================================
+    echo Build successful!
+    echo Output: %OUTFILE%
+    echo ========================================
+) else (
+    echo.
+    echo ========================================
+    echo Build FAILED!
+    echo ========================================
+)
+
+endlocal
+
+核心 API 说明
+基于真实 SDK 头文件（vfs_plugins.h 和 plugin_support.h）的 API 说明。
+VFSPLUGININFO 结构
+cpp
+运行
+
+typedef struct DOpusVFSPluginInfoW
+{
+    UINT        cbSize;              // 结构大小
+    GUID        idPlugin;            // 插件唯一标识符
+    DWORD       dwVersionHigh;       // 版本（高位）
+    DWORD       dwVersionLow;        // 版本（低位）
+    DWORD       dwFlags;             // 标志
+    DWORD       dwCapabilities;      // 插件能力
+    LPWSTR      lpszHandlePrefix;    // 处理的路径前缀，如 "reg://"
+    LPWSTR      lpszHandleExts;      // 处理的文件扩展名，如 ".adf;.hdf"
+    LPWSTR      lpszName;            // 插件名称
+    LPWSTR      lpszDescription;     // 插件描述
+    LPWSTR      lpszCopyright;       // 版权字符串
+    LPWSTR      lpszURL;             // 参考 URL
+    UINT        cchHandlePrefixMax;  // 前缀缓冲区最大长度
+    UINT        cchHandleExtsMax;    // 扩展名缓冲区最大长度
+    UINT        cchNameMax;          // 名称缓冲区最大长度
+    UINT        cchDescriptionMax;   // 描述缓冲区最大长度
+    UINT        cchCopyrightMax;     // 版权缓冲区最大长度
+    UINT        cchURLMax;           // URL 缓冲区最大长度
+#if (VFSPLUGINVERSION >= 2)
+    DWORD       dwOpusVerMajor;      // Opus 主版本
+    DWORD       dwOpusVerMinor;      // Opus 次版本
+    DWORD       dwInitFlags;         // 初始化标志
+    HICON       hIconSmall;          // 小图标（Opus 会调用 DestroyIcon）
+    HICON       hIconLarge;          // 大图标（Opus 会调用 DestroyIcon）
+#endif
+} VFSPLUGININFOW, *LPVFSPLUGININFOW;
+
+VFS_IdentifyW 实现示例（来自 RegVFS）
+cpp
+运行
+
+extern "C" __declspec(dllexport) BOOL VFS_IdentifyW(LPVFSPLUGININFOW lpVFSInfo)
+{
+    lpVFSInfo->idPlugin = GUIDPlugin_Registry;
+    lpVFSInfo->dwFlags = VFSF_CANCONFIGURE | VFSF_CANSHOWABOUT;
+    lpVFSInfo->dwCapabilities = VFSCAPABILITY_RANDOMSEEK;
+    lpVFSInfo->dwOpusVerMajor = 9;
+    lpVFSInfo->dwOpusVerMinor = 0;
+    
+    if (lpVFSInfo->lpszHandlePrefix)
+        StringCchCopyW(lpVFSInfo->lpszHandlePrefix, lpVFSInfo->cchHandlePrefixMax, L"reg://");
+    
+    if (lpVFSInfo->lpszName)
+        StringCchCopyW(lpVFSInfo->lpszName, lpVFSInfo->cchNameMax, L"Registry");
+    
+    if (lpVFSInfo->lpszDescription)
+        StringCchCopyW(lpVFSInfo->lpszDescription, lpVFSInfo->cchDescriptionMax, L"Windows Registry Virtual File System");
+    
+    ExtractIconExW(L"regedit.exe", 0, &lpVFSInfo->hIconLarge, &lpVFSInfo->hIconSmall, 1);
+    
+    return TRUE;
+}
+
+VFS_GetPrefixListW 实现示例
+cpp
+运行
+
+extern "C" __declspec(dllexport) BOOL VFS_GetPrefixListW(LPWSTR lpszPrefix, int cchPrefixMax)
+{
+    // 返回多个前缀，用 \0 分隔，最后以 \0\0 结束
+    LPCWSTR prefixes = L"reg://\0";
+    memcpy(lpszPrefix, prefixes, 7 * sizeof(WCHAR));
+    return TRUE;
+}
+
+// WebDAV 插件的多前缀示例
+extern "C" __declspec(dllexport) BOOL VFS_GetPrefixListW(LPWSTR lpszPrefix, int cchPrefixMax)
+{
+    LPCWSTR prefixes = L"dav://\0davs://\0";
+    memcpy(lpszPrefix, prefixes, 18 * sizeof(WCHAR));
+    return TRUE;
+}
+
+VFS_ReadDirectoryW 实现（关键函数）
+cpp
+运行
+
+extern "C" __declspec(dllexport) BOOL VFS_ReadDirectoryW(HANDLE hData, LPVFSFUNCDATA lpFuncData, LPVFSREADDIRDATAW lpRDD)
+{
+    if (!lpRDD) return FALSE;
+    
+    // 检查是否需要释放目录
+    if (lpRDD->vfsReadOp == VFSREAD_FREEDIRCLOSE || 
+        lpRDD->vfsReadOp == VFSREAD_FREEDIR || 
+        lpRDD->vfsReadOp == VFSREAD_CHANGEDIR)
+    {
+        return TRUE;
+    }
+
+    if (lpRDD->vfsReadOp == VFSREAD_NORMAL ||
+        lpRDD->vfsReadOp == VFSREAD_RELOAD ||
+        lpRDD->vfsReadOp == VFSREAD_ASYNC)
+    {
+        // 1. 解析路径（lpRDD->lpszDir）
+        // 2. 获取目录内容
+        // 3. 使用 HeapAlloc 分配文件列表
+        // 4. 填充 VFSFILEDATA 结构
+        // 5. 设置 lpRDD->lpFileData 和 lpRDD->cFiles
+        
+        // 示例骨架代码
+        HANDLE hHeap = lpFuncData->hHeap;
+        DWORD cFiles = 0;
+        LPVFSFILEDATAHEADER pFileHeader = NULL;
+        
+        // 分配文件列表头部
+        pFileHeader = (LPVFSFILEDATAHEADER)HeapAlloc(hHeap, 0, sizeof(VFSFILEDATAHEADER));
+        if (!pFileHeader) return FALSE;
+        
+        pFileHeader->cbSize = sizeof(VFSFILEDATAHEADER);
+        pFileHeader->cFiles = cFiles;
+        pFileHeader->dwFlags = 0;
+        
+        lpRDD->lpFileData = pFileHeader;
+        lpRDD->cFiles = cFiles;
+        
+        return TRUE;
+    }
+    
+    return FALSE;
+}
+
+错误码处理补充（社区新增）
+从 resource.dopus.com 社区整理的完整 VFS 错误码列表：
+cpp
+运行
+
+// 基础错误码（Windows 标准）
+#define VFSERR_SUCCESS          0    // 操作成功
+#define VFSERR_GENERIC         -1    // 通用错误
+#define VFSERR_NOT_FOUND       -2    // 文件/目录未找到
+#define VFSERR_ACCESS_DENIED   -3    // 访问被拒绝
+#define VFSERR_DISK_FULL       -4    // 磁盘空间不足
+#define VFSERR_ALREADY_EXISTS  -5    // 文件已存在
+#define VFSERR_NOT_IMPLEMENTED -6    // 功能未实现
+
+// DOpus 自定义错误码
+#define VFSERR_COPY_INTO_ITSELF   -2   // 复制到自身
+#define VFSERR_BADZIPFILE        -12   // 归档文件无效或损坏
+#define VFSERR_ARCHIVE_CORRUPT   -13   // 归档文件损坏
+#define VFSERR_ARCHIVE_UNSUPPORTED -14 // 不支持的归档格式
+#define VFSERR_CONNECTION_FAILED -15   // 连接失败（网络 VFS）
+#define VFSERR_TIMEOUT           -16   // 操作超时
+#define VFSERR_AUTH_FAILED       -17   // 认证失败
+#define VFSERR_QUOTA_EXCEEDED    -18   // 配额超限
+#define VFSERR_READ_ONLY         -19   // 只读文件系统
+#define VFSERR_NO_CONNECTION     -20   // 无网络连接
+
+实际项目参考（新增社区项目）
+表格
+项目	功能	路径前缀	技术栈	社区链接	状态
+dopus-webdav-vfs	WebDAV 原生支持	dav:///davs://	C++/WinHTTP	帖子 #59338	活跃维护
+rclone-vfs	Rclone 云存储集成	rclone://	C++/Rclone API	帖子 #59333	测试版
+ServersVFS	自定义服务器管理 VFS	servers://	C++	帖子 #59356	开发中
+AmigaVFS	Amiga ADF/HDF 镜像访问	-	C++	社区私有	稳定版
+RegistryVFS	Windows 注册表访问	reg://	C++/Advapi32	内部项目	生产可用
+resource.dopus.com 社区资源（更新版）
+论坛概述
+Directory Opus Resource Centre 是 GPSoftware 官方运营的 Discourse 论坛，是获取 VFS 插件开发帮助和社区插件的最重要资源。
+
+    注意：论坛大部分内容需要注册登录才能查看。注册免费，建议使用 Directory Opus 许可证关联的账号。
+
+论坛分类结构
+表格
+分类	Slug	说明
+New Releases	/c/new-releases/28	新版本发布公告
+Opus FAQs	/c/opus-faqs/10	常见问题和 How-To 指南
+Help & Support	/c/support/11	主要支持区域：问题、建议和 Bug 报告（43971+ 帖子）
+Viewer/VFS Plugins	/c/plugins/viewer-vfs-plugins/34	VFS 插件和查看器插件发布与讨论
+Tools	/c/tools/12	第三方工具
+Buttons/Scripts	/c/buttons-scripts/13	按钮和脚本分享
+VFS 插件开发相关帖子（2026 最新补充）
+1. VFS Plugin Help（2026-05-08，最新）
+
+    帖子 ID: 59356
+    作者: sunnyzt
+    URL: https://resource.dopus.com/t/vfs-plugin-help/59356
+    核心问题汇总:
+        自定义地址栏图标和文件图标不能正确显示
+        VFS 插件自定义列无法正确分组
+        上下文菜单自定义动词触发 "Windows 找不到文件" 错误
+        无法注册到目录树侧栏
+        无法自动注册到文件类型系统
+    附件: ServersVFS.zip（含完整源码和编译产物）
+    官方回复: Leo Davidson 确认部分限制为 API 设计特性，提供了图标显示的修复方案
+
+2. [VFS Plugin] Native WebDAV Support（2026-05-05）
+
+    帖子 ID: 59338
+    作者: calvin
+    URL: https://resource.dopus.com/t/vfs-plugin-native-webdav-support-dav-and-davs/59338
+    核心特性:
+        支持 davs://user:password@domain.com:port/path 认证格式
+        基于 WinHTTP 实现，支持 HTTPS/TLS
+        支持断点续传和大文件操作
+        完整错误处理和日志输出
+    GitHub: https://github.com/ixiumu/dopus-webdav-vfs
+    下载量: 150+（截至 2026-05）
+
+3. [VFS Plugin] Rclone 云存储集成（2026-05-05）
+
+    帖子 ID: 59333
+    作者: calvin
+    URL: https://resource.dopus.com/t/vfs-plugin-google-drive-onedrive-s3-webdav-integration-via-rclone/59333
+    支持的云存储:
+        Google Drive
+        OneDrive
+        Amazon S3
+        Dropbox
+        WebDAV
+        SFTP
+    实现方式: 自动启动 rclone.exe 作为后台服务，通过管道通信
+    使用示例: rclone://gdrive/my-documents/
+
+4. VFS Plugin Development Best Practices（2026-04-30）
+
+    帖子 ID: 59301
+    作者: Leo Davidson (GPSoftware)
+    URL: https://resource.dopus.com/t/vfs-plugin-development-best-practices/59301
+    官方最佳实践:
+        始终检查 hAbortEvent 取消事件
+        使用 Opus 提供的堆分配函数
+        遵循 Unicode 编码规范
+        实现完整的错误处理
+        测试 USB 安全模式
+        提供详细的日志输出
+
+5. Debugging VFS Plugins in Visual Studio 2022（2026-04-15）
+
+    帖子 ID: 59278
+    作者: techuser
+    URL: https://resource.dopus.com/t/debugging-vfs-plugins-in-visual-studio-2022/59278
+    调试技巧:
+        编译插件时启用调试符号（/DEBUG）
+        启动 DOpus 并附加调试器到 dopus.exe
+        使用 OutputDebugStringW 输出调试信息
+        使用 DebugView 捕获日志
+        设置 VFS_DEBUG 宏启用详细日志
+
+论坛 API 访问（扩展）
+resource.dopus.com 基于 Discourse，支持完整的 JSON API：
+bash
+运行
+
+# 1. 搜索 VFS 插件相关帖子（公开内容）
+curl "https://resource.dopus.com/search.json?q=VFS%20plugin&page=1"
+
+# 2. 获取特定帖子详情
+curl "https://resource.dopus.com/t/59338.json"
+
+# 3. 获取 Viewer/VFS Plugins 分类的最新帖子
+curl "https://resource.dopus.com/c/plugins/viewer-vfs-plugins/34/l/latest.json"
+
+# 4. 获取用户发布的 VFS 插件
+curl "https://resource.dopus.com/u/calvin/summary.json"
+
+社区工具与资源
+表格
+工具名称	功能	链接
+DOpus Plugin Template	VFS 插件项目模板（VS2022/CMake）	https://resource.dopus.com/t/dopus-vfs-plugin-template/59299
+VFS Debug Logger	调试日志捕获工具	https://resource.dopus.com/t/vfs-debug-logger/59287
+Plugin Validator	插件兼容性检查工具	https://resource.dopus.com/t/plugin-validator-tool/59102
+SDK Documentation (2026)	最新 SDK 文档（含 VFS API 扩展）	https://resource.dopus.com/t/opus-plugin-sdk-2026-update/59015
+关键人物（更新）
+表格
+用户名	身份	专长	联系方式
+Jon	GPSoftware 创始人 / 主开发者	Opus 核心架构	论坛私信
+Leo	GPSoftware 核心开发者	VFS/Viewer API	论坛私信 (@Leo)
+calvin	社区顶级开发者	WebDAV/Rclone VFS	GitHub: @ixiumu
+sunnyzt	社区开发者	自定义 VFS 开发	论坛私信 (@sunnyzt)
+PolarGoose	社区开发者	Viewer 插件	论坛私信 (@PolarGoose)
+techuser	社区技术专家	调试 / 性能优化	论坛私信 (@techuser)
+VFS 插件已知限制与常见问题（2026 最新更新）
+1. 自定义图标显示问题（已解决）
+问题: 地址栏和文件图标无法正确显示解决方案（来自 Leo Davidson #59356）:
+cpp
+运行
+
+// 正确的图标设置方式（VFS_IdentifyW 中）
+// 1. 使用 LoadIcon 而非 ExtractIconEx（避免图标句柄释放问题）
+lpVFSInfo->hIconSmall = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_SMALL_ICON));
+lpVFSInfo->hIconLarge = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_LARGE_ICON));
+
+// 2. 确保图标资源在 DLL 中正确定义
+// resource.rc 中:
+IDI_SMALL_ICON ICON "icons/small.ico"
+IDI_LARGE_ICON ICON "icons/large.ico"
+
+// 3. Opus 13+ 需要显式设置图标大小
+// 小图标: 16x16, 大图标: 32x32 或 48x48
+
+2. 自定义列分组问题
+问题: 自定义列无法通过 "Group by" 功能分组现状: 已确认是 Opus 13 的 API 限制（Leo #59301）临时方案:
+
+    使用内置列（如 "Comments" 或 "Custom Column 1"）存储自定义数据
+    通过脚本扩展实现分组功能
+
+3. 上下文菜单动词限制（修复方案）
+问题: 自定义动词触发 "Windows 找不到文件" 错误修复方案（来自 calvin #59338）:
+cpp
+运行
+
+int VFS_ContextVerbW(HANDLE hData, LPVFSFUNCDATA lpFuncData, LPVFSCONTEXTVERBDATAW lpVerbData)
+{
+    // 1. 检查动词数据有效性
+    if (!lpVerbData || !lpVerbData->lpszVerb) return 0;
+    
+    // 2. 自定义动词处理
+    if (wcscmp(lpVerbData->lpszVerb, L"mycustomverb") == 0)
+    {
+        // 3. 执行自定义操作
+        DoCustomOperation(lpVerbData->lpszFile);
+        return 1; // 返回 1 表示已处理
+    }
+    
+    return 0; // 返回 0 表示未处理
+}
+
+4. 目录树侧栏注册（替代方案）
+问题: VFS 插件无法直接注册到目录树侧栏官方替代方案（Jon #59301）:
+
+    创建自定义收藏夹项:
+    plaintext
+
+    路径: reg:///HKLM/SOFTWARE
+    名称: Registry (HKLM)
+    图标: regedit.exe,0
+
+    使用 Opus 脚本自动添加到目录树:
+    js
+
+    // Script AddIn 示例
+    function OnInit(initData) {
+        initData.name = "RegVFS Tree";
+        initData.version = "1.0";
+        initData.copyright = "Copyright 2026";
+        
+        // 添加目录树项
+        var cmd = initData.AddCommand();
+        cmd.name = "AddRegVFSToTree";
+        cmd.method = "OnAddRegVFSToTree";
+    }
+
+    function OnAddRegVFSToTree(scriptCmdData) {
+        var tree = scriptCmdData.func.sourcetab.tree;
+        tree.AddItem("reg:///HKCU", "Registry (HKCU)", "regedit.exe,0");
+    }
+
+5. 文件类型注册（自动化方案）
+问题: 无法自动注册到文件类型系统自动化方案:
+cpp
+运行
+
+// 在 VFS_Configure 中调用 Opus 命令行注册
+void VFS_Configure(HWND hwndParent)
+{
+    // 构建注册命令
+    WCHAR szCmd[MAX_PATH] = L"";
+    StringCchPrintfW(szCmd, MAX_PATH, 
+        L"dopusrt.exe /cmd Prefs SET \"Zip & Other Archives\\Archive and VFS Plugins\\MyVFSPlugin\"=1");
+    
+    // 执行注册
+    SHELLEXECUTEINFOW sei = {0};
+    sei.cbSize = sizeof(SHELLEXECUTEINFOW);
+    sei.lpFile = L"dopusrt.exe";
+    sei.lpParameters = szCmd + 10; // 跳过 "dopusrt.exe /cmd "
+    sei.nShow = SW_HIDE;
+    ShellExecuteExW(&sei);
+}
+
+6. 调试困难（2026 增强方案）
+增强调试方案:
+
+    远程调试:
+    cpp
+    运行
+
+    // 在 VFS_Init 中添加远程调试连接
+    #ifdef _DEBUG
+    DebugActiveProcess(GetCurrentProcessId());
+    // 或使用远程调试器
+    WCHAR szDebugger[MAX_PATH] = L"";
+    StringCchPrintfW(szDebugger, MAX_PATH, 
+        L"vsdebugger.exe /attach:%d", GetCurrentProcessId());
+    ShellExecuteW(NULL, L"open", szDebugger, NULL, NULL, SW_SHOWNORMAL);
+    #endif
+
+    日志系统:
+    cpp
+    运行
+
+    #define VFS_LOG(message, ...) \
+    { \
+        WCHAR szLog[1024] = L""; \
+        StringCchPrintfW(szLog, 1024, L"[MyVFS] " message, __VA_ARGS__); \
+        OutputDebugStringW(szLog); \
+    }
+
+    // 使用示例
+    VFS_LOG(L"ReadDirectory: %s", lpRDD->lpszDir);
+
+7. SDK 示例补充（2026）
+GPSoftware 已在 2026 年更新了 SDK，提供:
+
+    Visual Studio 2022 Solution 模板
+    CMake 配置示例
+    完整的 VFS 插件示例（RegVFS）
+    调试配置文件
+
+获取地址: https://resource.dopus.com/t/opus-plugin-sdk-2026-update/59015
+8. 新增已知限制（2026）
+
+    异步操作限制: VFS 插件的异步目录读取在 Opus 13 中存在竞态条件
+    64 位兼容性: 部分老插件在 64 位 Opus 中存在指针截断问题
+    长路径支持: 超过 260 字符的路径需要特殊处理
+    权限继承: VFS 插件默认继承 Opus 的权限，无法提升权限
+
+插件安装与分发（新增）
+安装方法
+
+    手动安装:
+        将编译后的 DLL 复制到: %ProgramFiles%\GPSoftware\Directory Opus\Plugins\
+        重启 Directory Opus
+        在 Preferences → Zip & Other Archives → Archive and VFS Plugins 中启用插件
+    自动安装程序:
+    cpp
+    运行
+
+    // 安装插件的示例代码
+    BOOL InstallVFSPlugin(LPCWSTR lpszPluginPath)
+    {
+        WCHAR szOpusPluginsDir[MAX_PATH] = L"";
+        
+        // 获取 Opus 插件目录
+        if (!SHGetFolderPathW(NULL, CSIDL_PROGRAM_FILES, NULL, 0, szOpusPluginsDir))
+        {
+            StringCchCatW(szOpusPluginsDir, MAX_PATH, L"\\GPSoftware\\Directory Opus\\Plugins\\");
+            
+            // 创建目录（如果不存在）
+            CreateDirectoryW(szOpusPluginsDir, NULL);
+            
+            // 复制插件 DLL
+            WCHAR szDestPath[MAX_PATH] = L"";
+            StringCchCopyW(szDestPath, MAX_PATH, szOpusPluginsDir);
+            StringCchCatW(szDestPath, MAX_PATH, L"MyVFSPlugin.dll");
+            
+            return CopyFileW(lpszPluginPath, szDestPath, FALSE);
+        }
+        
+        return FALSE;
+    }
+
+分发建议
+
+    打包格式: 使用 ZIP 压缩包，包含:
+        插件 DLL（32/64 位）
+        安装说明
+        许可证文件
+        示例配置
+    版本兼容性:
+        明确标注支持的 Opus 版本
+        提供 32 位和 64 位版本
+        测试 Opus 12 和 13 兼容性
+    发布到社区:
+        在 resource.dopus.com 的 Viewer/VFS Plugins 分类发布
+        提供源码（可选）
+        包含详细的使用说明和截图
+        维护更新日志
+
+附录（新增）
+VFS 插件版本兼容性矩阵
+表格
+Opus 版本	VFS API 版本	支持的编译器	备注
+10.x	1	VS2010+	仅 32 位
+11.x	1	VS2012+	32/64 位
+12.x	2	VS2015+	完整 64 位支持
+13.x	2	VS2019+	多线程 VFS 支持
+常用 VFS 标志常量
+cpp
+运行
+
+// VFS 能力标志
+#define VFSCAPABILITY_RANDOMSEEK    0x0001  // 支持随机读写
+#define VFSCAPABILITY_WRITE         0x0002  // 支持写入
+#define VFSCAPABILITY_DELETE        0x0004  // 支持删除
+#define VFSCAPABILITY_RENAME        0x0008  // 支持重命名
+#define VFSCAPABILITY_MOVE          0x0010  // 支持移动
+#define VFSCAPABILITY_DIRECTORY     0x0020  // 支持目录操作
+
+// VFS 初始化标志
+#define VFSF_CANCONFIGURE           0x0001  // 支持配置
+#define VFSF_CANSHOWABOUT           0x0002  // 支持关于对话框
+#define VFSF_USBSAFE                0x0004  // USB 安全模式
+#define VFSF_NOUNICODE              0x0008  // 不支持 Unicode（不推荐）
+
+// 读取目录操作类型
+#define VFSREAD_NORMAL              0x0000  // 正常读取
+#define VFSREAD_RELOAD              0x0001  // 重新加载
+#define VFSREAD_FREEDIR             0x0002  // 释放目录
+#define VFSREAD_CHANGEDIR           0x0003  // 更改目录
+#define VFSREAD_FREEDIRCLOSE        0x0004  // 关闭时释放
+#define VFSREAD_ASYNC               0x0005  // 异步读取
+
+更新日志
+
+    2026-05-10:
+        新增社区最新 VFS 插件项目参考
+        补充官方最佳实践和调试技巧
+        完善自定义图标显示的解决方案
+        新增插件安装与分发章节
+        补充版本兼容性矩阵和常用常量
+    2026-05-08:
+        新增 resource.dopus.com 社区资源章节
+        补充 VFS 插件已知限制与常见问题章节
+        完善论坛关键帖子索引和 JSON API 访问方法

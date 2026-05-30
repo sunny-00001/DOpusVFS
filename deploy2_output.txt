@@ -1,0 +1,4 @@
+  cd D:\VFS\CodeupVFS\test
+  CheckConfig.exe
+
+Press any key to continue . . . 

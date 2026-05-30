@@ -1,0 +1,59 @@
+cmake_minimum_required(VERSION 3.16)
+project(IPFSVFS VERSION 1.0.0 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS OFF)
+
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
+
+add_library(IPFSVFS SHARED
+    src/IPFSVFS.cpp
+    IPFSClient.cpp
+    resource.rc
+)
+
+target_include_directories(IPFSVFS PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    ${CMAKE_SOURCE_DIR}
+)
+
+target_compile_definitions(IPFSVFS PRIVATE
+    UNICODE
+    _UNICODE
+    WIN32_LEAN_AND_MEAN
+    DOPUS_PLUGIN_HELPER
+    VFSPLUGINVERSION=2
+)
+
+target_link_libraries(IPFSVFS PRIVATE
+    advapi32
+    Shell32
+    Comctl32
+    Winhttp
+    Ole32
+)
+
+set_target_properties(IPFSVFS PROPERTIES
+    OUTPUT_NAME "IPFSVFS"
+    PREFIX ""
+    SUFFIX ".dll"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/.."
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/.."
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/.."
+)
+
+if(MSVC)
+    target_compile_options(IPFSVFS PRIVATE /W4 /utf-8)
+    target_link_options(IPFSVFS PRIVATE /DEF:${CMAKE_SOURCE_DIR}/IPFSVFS.def /NOIMPLIB)
+endif()
+
+foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})
+    string(TOUPPER ${CONFIG} CONFIG_UPPER)
+    set_target_properties(IPFSVFS PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY_${CONFIG_UPPER} "${CMAKE_SOURCE_DIR}/.."
+        LIBRARY_OUTPUT_DIRECTORY_${CONFIG_UPPER} "${CMAKE_SOURCE_DIR}/.."
+        ARCHIVE_OUTPUT_DIRECTORY_${CONFIG_UPPER} "${CMAKE_SOURCE_DIR}/.."
+    )
+endforeach()

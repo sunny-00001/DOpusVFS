@@ -1,0 +1,33 @@
+#ifndef RESOURCE_H
+#define RESOURCE_H
+
+#define IDD_RCLONE_CONFIG         201
+#define IDD_RCLONE_ABOUT         202
+
+// Nav
+#define IDC_RCLONE_NAV_LIST      1100
+
+// Page 0: Paths
+#define IDC_RCLONE_LBL_EXE       1201
+#define IDC_RCLONE_EXE_PATH      1202
+#define IDC_RCLONE_BROWSE_EXE    1203
+#define IDC_RCLONE_LBL_REMOTE    1204
+#define IDC_RCLONE_DEFAULT_REMOTE 1205
+
+// Page 1: Behavior
+#define IDC_RCLONE_LBL_CACHE     1301
+#define IDC_RCLONE_CACHE_TIMEOUT 1302
+#define IDC_RCLONE_LBL_UPLOAD    1303
+#define IDC_RCLONE_UPLOAD_CHUNK  1304
+#define IDC_RCLONE_LBL_DL_BUF    1305
+#define IDC_RCLONE_DL_BUFFER     1306
+#define IDC_RCLONE_CHK_HIDDEN    1307
+#define IDC_RCLONE_CHK_DEL       1308
+#define IDC_RCLONE_CHK_OVERWRITE 1309
+#define IDC_RCLONE_CHK_VERBOSE   1310
+
+// Buttons
+#define IDC_RCLONE_APPLY         1501
+#define IDC_RCLONE_RESET         1502
+
+#endif

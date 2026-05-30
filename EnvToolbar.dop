@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<toolbar>
+	<image_settings fill="none" fit="0x408" image="" inheritable="yes" opacity="100" use_custom="no" />
+	<buttons backcol="none" display="icon" textcol="none" type="menu">
+		<button backcol="none" display="icon" textcol="none">
+			<label>打开环境变量</label>
+			<icon1>#Win11theme:folderopen</icon1>
+			<function type="normal">
+				<instruction>EnvOpen</instruction>
+			</function>
+		</button>
+		<button backcol="none" display="icon" textcol="none">
+			<label>新建环境变量</label>
+			<icon1>#Win11theme:newcollection</icon1>
+			<function type="normal">
+				<instruction>EnvNew</instruction>
+			</function>
+		</button>
+		<button backcol="none" display="icon" textcol="none">
+			<label>删除环境变量</label>
+			<icon1>#Win11theme:delete</icon1>
+			<function type="normal">
+				<instruction>EnvDelete</instruction>
+			</function>
+		</button>
+	</buttons>
+</toolbar>

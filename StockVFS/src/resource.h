@@ -1,0 +1,42 @@
+#ifndef RESOURCE_H
+#define RESOURCE_H
+
+#define IDD_STOCK_CONFIG         401
+#define IDD_STOCK_ABOUT          402
+
+// Nav
+#define IDC_STOCK_NAV_LIST       1100
+
+// Page 0: Data Source (General)
+#define IDC_STOCK_LBL_SOURCE    1201
+#define IDC_STOCK_DATASOURCE     1202
+#define IDC_STOCK_LBL_CACHE     1203
+#define IDC_STOCK_CACHE_TIMEOUT 1204
+#define IDC_STOCK_LBL_REFRESH   1205
+#define IDC_STOCK_REFRESH       1206
+#define IDC_STOCK_CHK_COLOR     1207
+#define IDC_STOCK_CHK_VOLUME    1208
+#define IDC_STOCK_LBL_PERPAGE  1209
+#define IDC_STOCK_ITEMS_PER_PAGE 1210
+#define IDC_STOCK_LBL_METAPFX   1211
+#define IDC_STOCK_METAPREFIX    1212
+
+// Page 1: API Keys
+#define IDC_STOCK_LBL_TUSHARE   1301
+#define IDC_STOCK_TUSHARE_TOKEN 1302
+#define IDC_STOCK_LBL_ALPHA     1303
+#define IDC_STOCK_ALPHA_KEY     1304
+
+// Page 2: Proxy
+#define IDC_STOCK_LBL_PROXY     1401
+#define IDC_STOCK_PROXY_TYPE    1402
+#define IDC_STOCK_LBL_HOST      1403
+#define IDC_STOCK_PROXY_HOST    1404
+#define IDC_STOCK_LBL_PORT      1405
+#define IDC_STOCK_PROXY_PORT    1406
+
+// Buttons
+#define IDC_STOCK_APPLY         1501
+#define IDC_STOCK_RESET         1502
+
+#endif

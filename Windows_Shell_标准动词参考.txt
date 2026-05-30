@@ -1,0 +1,171 @@
+Windows Shell 标准动词（Standard Verbs）参考
+==============================================
+
+来源：Windows Shell API / Directory Opus VFS Plugin SDK
+
+一、VFS_ContextVerbW 可接收的系统标准动词
+------------------------------------------
+
+动词        | 触发方式          | 说明
+------------|-------------------|--------------------------------------------------
+NULL        | 双击文件/文件夹    | 默认动作，表示用户双击，插件应执行默认操作
+open        | 双击 / 右键→打开   | 打开文件或文件夹，与 NULL 等价
+edit        | 右键→编辑          | 用关联编辑器打开文件进行编辑
+print       | 右键→打印          | 用关联程序打印文件
+explore     | 右键→资源管理器    | 在资源管理器中浏览文件夹
+find        | 右键→搜索          | 在指定路径中搜索
+properties  | 右键→属性          | 显示文件/文件夹属性对话框
+cut         | 右键→剪切          | 剪切文件到剪贴板
+copy        | 右键→复制          | 复制文件到剪贴板
+paste       | 右键→粘贴          | 从剪贴板粘贴文件
+delete      | 右键→删除          | 删除文件
+rename      | 右键→重命名        | 重命名文件
+
+注意：
+- NULL 和 "open" 等价，均表示默认打开动作
+- 这些动词由 DOpus/Windows Shell 自动传递，不需要在 VFS_GetContextMenuW 中注册
+- delete、rename、cut、copy、paste 等操作通常由对应的 VFS 导出函数处理，
+  而非通过 VFS_ContextVerbW：
+    删除   → VFS_DeleteFileW     + VFSFUNCAVAIL_DELETE
+    移动   → VFS_MoveFileW       + VFSFUNCAVAIL_MOVE
+    复制   → VFSFUNCAVAIL_COPY / VFSFUNCAVAIL_CLIPCOPY
+    剪切   → VFSFUNCAVAIL_CLIPCUT
+    粘贴   → VFSFUNCAVAIL_CLIPPASTE
+    重命名 → VFS_RenameFileW     + VFSFUNCAVAIL_RENAME
+    属性   → VFS_PropertiesW     + VFSFUNCAVAIL_PROPERTIES
+
+
+二、VFS_ContextVerbW 返回值
+----------------------------
+
+返回值              | 值 | 含义
+--------------------|----|--------------------------------------------------
+VFSCVRES_FAIL       | 0  | 操作失败
+VFSCVRES_HANDLED    | 1  | 已处理，DOpus 无需再做任何事
+VFSCVRES_DEFAULT    | 2  | 让 DOpus 执行默认操作（仅适用于真实文件系统路径）
+VFSCVRES_EXTRACT    | 3  | 让 DOpus 通过 VFS_ExtractFiles 提取文件到临时位置再处理
+VFSCVRES_CHANGE     | 4  | 已处理，lpszNewPath 中提供了新路径，DOpus 会重新调用
+VFSCVRES_CHANGEDIR  | 5  | 已处理，切换到 lpszNewPath 指定的新目录
+
+
+三、VFSCONTEXTVERBDATAW 结构体字段
+-----------------------------------
+
+字段           | 类型    | 说明
+---------------|---------|--------------------------------------------------
+cbSize         | UINT    | 结构体大小
+hwndParent     | HWND    | 父窗口句柄，用于显示对话框
+lpszVerb       | LPWSTR  | 动词字符串，NULL 表示双击默认动作
+lpszPath       | LPWSTR  | 操作目标文件的完整路径
+lpszNewPath    | LPWSTR  | 新路径缓冲区，用于 VFSCVRES_CHANGE 返回值
+cchNewPathMax  | int     | lpszNewPath 缓冲区最大字符数
+uMsg           | UINT    | 触发此操作的消息代码，通常为 0 或 WM_LBUTTONDBLCLK
+fwKeys         | WPARAM  | 修饰键状态（MK_SHIFT, MK_CONTROL, MK_ALT 等）
+dwFlags        | DWORD   | 标志位，目前仅定义 DOPUSCVF_ISDIR (1<<3) 表示目标是目录
+iRotateAngle   | int     | 缩略图旋转角度
+
+
+四、系统标准动词 vs 自定义动词
+-------------------------------
+
+                  | 系统标准动词                | 自定义动词
+------------------|----------------------------|------------------------------------------
+来源              | Windows Shell / DOpus 自动  | 插件在 VFS_GetContextMenuW 中注册
+触发方式          | 双击、右键系统菜单          | 右键自定义菜单项
+是否需要注册      | 不需要                      | 必须在 VFS_GetContextMenuW 中注册
+lpszVerb 值       | NULL, "open", "edit" 等     | 任意自定义字符串，如 "kill", "gh_search"
+不注册的后果      | 无影响，系统自动触发        | 右键菜单中不出现该项，用户无法触发
+
+
+五、VFSFUNCAVAILABILITY 功能可用性标志
+---------------------------------------
+
+标志                              | 位 | 含义
+----------------------------------|----|--------------------------------------
+VFSFUNCAVAIL_COPY                 | 0  | 复制
+VFSFUNCAVAIL_MOVE                 | 1  | 移动
+VFSFUNCAVAIL_DELETE               | 2  | 删除
+VFSFUNCAVAIL_GETSIZES             | 3  | 获取大小
+VFSFUNCAVAIL_MAKEDIR              | 4  | 创建目录
+VFSFUNCAVAIL_PRINT                | 5  | 打印
+VFSFUNCAVAIL_PROPERTIES           | 6  | 属性
+VFSFUNCAVAIL_RENAME               | 7  | 重命名
+VFSFUNCAVAIL_SETATTR              | 8  | 设置属性
+VFSFUNCAVAIL_SHORTCUT             | 9  | 创建快捷方式
+VFSFUNCAVAIL_SELECTALL            | 10 | 全选
+VFSFUNCAVAIL_SELECTNONE           | 11 | 取消全选
+VFSFUNCAVAIL_SELECTINVERT         | 12 | 反选
+VFSFUNCAVAIL_VIEWLARGEICONS       | 13 | 大图标视图
+VFSFUNCAVAIL_VIEWSMALLICONS       | 14 | 小图标视图
+VFSFUNCAVAIL_VIEWLIST             | 15 | 列表视图
+VFSFUNCAVAIL_VIEWDETAILS          | 16 | 详细视图
+VFSFUNCAVAIL_VIEWTHUMBNAIL        | 17 | 缩略图视图
+VFSFUNCAVAIL_CLIPCOPY             | 18 | 剪贴板复制
+VFSFUNCAVAIL_CLIPCUT              | 19 | 剪贴板剪切
+VFSFUNCAVAIL_CLIPPASTE            | 20 | 剪贴板粘贴
+VFSFUNCAVAIL_CLIPPASTESHORTCUT    | 21 | 粘贴快捷方式
+VFSFUNCAVAIL_UNDO                 | 22 | 撤销
+VFSFUNCAVAIL_SHOW                 | 23 | 显示
+VFSFUNCAVAIL_DUPLICATE            | 24 | 创建副本
+VFSFUNCAVAIL_SPLITJOIN            | 25 | 分割/合并
+VFSFUNCAVAIL_SELECTRESELECT       | 26 | 重新选择
+VFSFUNCAVAIL_SELECTALLFILES       | 27 | 选择所有文件
+VFSFUNCAVAIL_SELECTALLDIRS        | 28 | 选择所有目录
+VFSFUNCAVAIL_PLAY                 | 29 | 播放
+VFSFUNCAVAIL_SETTIME              | 30 | 设置时间
+VFSFUNCAVAIL_VIEWTILE             | 31 | 平铺视图
+VFSFUNCAVAIL_SETCOMMENT           | 32 | 设置注释
+
+
+六、项目中各插件已实现的自定义动词
+----------------------------------
+
+[ProcessVFS]
+  kill        - 结束单个进程
+  killtree    - 结束进程树
+  killall     - 结束同名进程的所有实例
+  killalltree - 结束同名进程及所有子进程
+  openlocation - 打开进程可执行文件所在目录
+  proc_properties - 显示进程属性对话框
+  proc_taskmgr - 打开任务管理器
+  copypath    - 复制进程路径到剪贴板
+
+[GitHubVFS]
+  gh_search       - 搜索 GitHub 仓库
+  gh_search_code  - 搜索 GitHub 代码
+  gh_open_browser - 在浏览器中打开
+  gh_copy_clone_url - 复制 clone URL
+  gh_view_issues  - 查看 Issues
+  gh_view_prs     - 查看 Pull Requests
+  gh_view_releases - 查看 Releases
+  gh_copy_repo_url - 复制仓库 URL
+  gh_copy_raw_url - 复制文件原始 URL
+  gh_copy_sha     - 复制文件 SHA
+  gh_refresh      - 刷新缓存
+
+[ServiceVFS]
+  start    - 启动服务
+  stop     - 停止服务
+  pause    - 暂停服务
+  continue - 恢复服务
+  restart  - 重启服务
+
+[TaskSchedulerVFS]
+  run             - 运行计划任务
+  stop            - 停止任务
+  restart         - 重启任务
+  disable         - 禁用任务
+  enable          - 启用任务
+  tsk_properties  - 显示任务属性
+
+[FirewallVFS]
+  fw_enable      - 启用防火墙规则
+  fw_disable     - 禁用防火墙规则
+  fw_delete      - 删除防火墙规则
+  fw_copyname    - 复制规则名称
+  fw_openlocation - 打开程序所在目录
+  fw_properties  - 显示规则属性
+  fw_openwf      - 打开高级安全防火墙
+
+[RegVFS]
+  properties - 显示注册表项属性（通过 VFS_GetContextMenuW 注册）

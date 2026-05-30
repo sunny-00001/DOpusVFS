@@ -1,0 +1,57 @@
+#include "resource.h"
+#include "windows.h"
+
+1 VERSIONINFO
+FILEVERSION 5,0,0,0
+PRODUCTVERSION 5,0,0,0
+FILEFLAGSMASK 0x3fL
+FILEFLAGS 0x0L
+FILEOS 0x4L
+FILETYPE 0x2L
+FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080404B0"
+        BEGIN
+            VALUE "CompanyName", "RegVFS"
+            VALUE "FileDescription", "Windows Registry VFS Plugin for Directory Opus"
+            VALUE "FileVersion", "5.0.0.0"
+            VALUE "InternalName", "RegistryVFS"
+            VALUE "LegalCopyright", "(c) 2026"
+            VALUE "OriginalFilename", "RegistryVFS.dll"
+            VALUE "ProductName", "Registry VFS Plugin"
+            VALUE "ProductVersion", "5.0.0.0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x804, 1200
+    END
+END
+
+IDD_REG_CONFIG DIALOGEX 0, 0, 300, 250
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX
+CAPTION "Registry VFS"
+FONT 9, "Microsoft YaHei UI", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK", IDOK, 138, 234, 50, 12
+    PUSHBUTTON      "Cancel", IDCANCEL, 192, 234, 50, 12
+    PUSHBUTTON      "Apply", IDC_APPLY, 246, 234, 50, 12
+
+    LISTBOX         IDC_NAV_LIST, 4, 4, 36, 228, LBS_NOINTEGRALHEIGHT | LBS_OWNERDRAWFIXED | WS_VSCROLL | WS_TABSTOP
+
+    CONTROL         "", IDC_READONLY_MODE, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 44, 8, 250, 10
+    CONTROL         "", IDC_CONFIRM_DELETE, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 44, 20, 250, 10
+    CONTROL         "", IDC_SHOW_DEFAULT_VALUES, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 44, 32, 250, 10
+    CONTROL         "", IDC_AUTO_REFRESH, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 44, 44, 250, 10
+
+    CONTROL         "", IDC_EXPAND_ENV_VARS, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 44, 8, 250, 10
+    CONTROL         "", IDC_SHOW_BINARY_AS_HEX, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 44, 20, 250, 10
+    CONTROL         "", IDC_CASE_SENSITIVE, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 44, 32, 250, 10
+    CONTROL         "", IDC_SHOW_SIZE_COLUMN, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 44, 44, 250, 10
+    CONTROL         "", IDC_SHOW_TYPE_COLUMN, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 44, 56, 250, 10
+
+    PUSHBUTTON      "", IDC_OPEN_REGEDIT, 4, 234, 54, 12
+    PUSHBUTTON      "", IDC_RESET_DEFAULTS, 62, 234, 50, 12
+END

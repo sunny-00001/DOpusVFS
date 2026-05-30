@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<toolbar>
+	<image_settings fill="none" fit="0x408" image="" inheritable="yes" opacity="100" use_custom="no" />
+	<buttons backcol="none" display="icon" textcol="none" type="menu">
+		<button backcol="none" display="icon" textcol="none">
+			<label>查看详情</label>
+			<tip>查看选中WiFi的详细信息</tip>
+			<icon1>#Win11theme:properties</icon1>
+			<function type="normal">
+				<instruction>@nodeselect</instruction>
+				<instruction>WifiViewDetail</instruction>
+			</function>
+		</button>
+		<button backcol="none" display="icon" textcol="none">
+			<label>编辑密码</label>
+			<tip>编辑选中WiFi的密码</tip>
+			<icon1>#Win11theme:edit</icon1>
+			<function type="normal">
+				<instruction>@nodeselect</instruction>
+				<instruction>WifiEditPassword</instruction>
+			</function>
+		</button>
+		<button backcol="none" display="icon" textcol="none" type="separator">
+		</button>
+		<button backcol="none" display="icon" textcol="none">
+			<label>复制密码</label>
+			<tip>复制选中WiFi的密码到剪贴板</tip>
+			<icon1>#Win11theme:copy</icon1>
+			<function type="normal">
+				<instruction>@nodeselect</instruction>
+				<instruction>WifiCopyPassword</instruction>
+			</function>
+		</button>
+		<button backcol="none" display="icon" textcol="none">
+			<label>复制名称</label>
+			<tip>复制选中WiFi的名称到剪贴板</tip>
+			<icon1>#Win11theme:copy</icon1>
+			<function type="normal">
+				<instruction>@nodeselect</instruction>
+				<instruction>WifiCopyName</instruction>
+			</function>
+		</button>
+		<button backcol="none" display="icon" textcol="none" type="separator">
+		</button>
+		<button backcol="none" display="icon" textcol="none">
+			<label>连接网络</label>
+			<tip>连接到选中的WiFi网络</tip>
+			<icon1>#Win11theme:media_play</icon1>
+			<function type="normal">
+				<instruction>@nodeselect</instruction>
+				<instruction>WifiConnect</instruction>
+			</function>
+		</button>
+		<button backcol="none" display="icon" textcol="none">
+			<label>忘记网络</label>
+			<tip>忘记(删除)选中的WiFi网络</tip>
+			<icon1>#Win11theme:delete</icon1>
+			<function type="normal">
+				<instruction>@nodeselect</instruction>
+				<instruction>WifiForget</instruction>
+			</function>
+		</button>
+		<button backcol="none" display="icon" textcol="none" type="separator">
+		</button>
+		<button backcol="none" display="icon" textcol="none">
+			<label>刷新列表</label>
+			<tip>刷新WiFi列表</tip>
+			<icon1>#Win11theme:nav_refresh</icon1>
+			<function type="normal">
+				<instruction>@nodeselect</instruction>
+				<instruction>WifiRefresh</instruction>
+			</function>
+		</button>
+	</buttons>
+</toolbar>
